@@ -42,37 +42,42 @@ library(dummies)
 
 ```{r}
 # Read in data
-# na.strings = "No answer" simply means that answers coded in as "No answer" in the data is NA
-dat_vote <- read.csv("vote_parties.csv", na.strings = "No answer")
+dat <- read.csv("vote_parties.csv", na.strings = "No answer")
+dat <- na.omit(dat)
 
-names(dat_vote)[names(dat_vote) == "a5"] <- "PaperTime"
-names(dat_vote)[names(dat_vote) == "b1"] <- "PoInt"
-names(dat_vote)[names(dat_vote) == "b11"] <- "VoteLast"
-names(dat_vote)[names(dat_vote) == "b12"] <- "VoteParty"
-names(dat_vote)[names(dat_vote) == "c1"] <- "HapScale"
-names(dat_vote)[names(dat_vote) == "c5"] <- "Crime5year"
-names(dat_vote)[names(dat_vote) == "c15"] <- "HealthLvl"
-names(dat_vote)[names(dat_vote) == "c28"] <- "SweBorn"
-names(dat_vote)[names(dat_vote) == "c33"] <- "FSweBorn"
-names(dat_vote)[names(dat_vote) == "c35"] <- "MSweBorn"
-names(dat_vote)[names(dat_vote) == "d4"] <- "Spouse3year"
-names(dat_vote)[names(dat_vote) == "d6"] <- "Married"
-names(dat_vote)[names(dat_vote) == "d9"] <- "TotalChildren"
-names(dat_vote)[names(dat_vote) == "e4"] <- "OptLvl"
-names(dat_vote)[names(dat_vote) == "e5"] <- "PosLvl"
-names(dat_vote)[names(dat_vote) == "e7"] <- "SalLvl"
-names(dat_vote)[names(dat_vote) == "f1"] <- "FamSize"
-names(dat_vote)[names(dat_vote) == "f2"] <- "Gender"
-names(dat_vote)[names(dat_vote) == "f3"] <- "Bdate"
-names(dat_vote)[names(dat_vote) == "f5"] <- "Area"
-names(dat_vote)[names(dat_vote) == "f27"] <- "FormUnemp"
-names(dat_vote)[names(dat_vote) == "f30"] <- "TradeUn"
-names(dat_vote)[names(dat_vote) == "f32"] <- "IncLvl"
-summary(dat_vote$VoteParty)
+names(dat)[names(dat) == "a5"] <- "PaperTime"
+names(dat)[names(dat) == "b1"] <- "PoInt"
+names(dat)[names(dat) == "b11"] <- "VoteLast"
+names(dat)[names(dat) == "b12"] <- "VoteParty"
+names(dat)[names(dat) == "c1"] <- "HapScale"
+names(dat)[names(dat) == "c5"] <- "Crime5year"
+names(dat)[names(dat) == "c15"] <- "HealthLvl"
+names(dat)[names(dat) == "c28"] <- "SweBorn"
+names(dat)[names(dat) == "c33"] <- "FSweBorn"
+names(dat)[names(dat) == "c35"] <- "MSweBorn"
+names(dat)[names(dat) == "d4"] <- "Spouse3year"
+names(dat)[names(dat) == "d6"] <- "Married"
+names(dat)[names(dat) == "d9"] <- "TotalChildren"
+names(dat)[names(dat) == "e4"] <- "OptLvl"
+names(dat)[names(dat) == "e5"] <- "PosLvl"
+names(dat)[names(dat) == "e7"] <- "SalLvl"
+names(dat)[names(dat) == "f1"] <- "FamSize"
+names(dat)[names(dat) == "f2"] <- "Gender"
+names(dat)[names(dat) == "f3"] <- "Bdate"
+names(dat)[names(dat) == "f5"] <- "Area"
+names(dat)[names(dat) == "f27"] <- "FormUnemp"
+names(dat)[names(dat) == "f30"] <- "TradeUn"
+names(dat)[names(dat) == "f32"] <- "IncLvl"
+levels(dat$VoteParty)
 ```
 
-
-
+```{r}
+dat %>%
+  filter(VoteParty != c("NOT APPLICABLE", "NO ANSWER", "DONT KNOW", "REFUSAL")) %>% 
+  ggplot(mapping = aes(x = VoteParty)) +
+  geom_bar() +
+  coord_flip()
+```
 
 
 
