@@ -1,0 +1,82 @@
+---
+title: "Homework Assignment 1"
+author:
+- "Author: Claes Kock,Yuchong Wu, add here"
+Date: 10/12/2019
+header-includes:
+   - \usepackage{array}
+   - \usepackage{float}
+output:
+  pdf_document:
+    number_sections: yes
+---
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE)
+library(knitr)
+library(ggplot2)
+library(tidyverse)
+library(dummies)
+```
+
+# Abstract
+
+# Introduction
+
+# Theory
+
+# Data
+
+# Results
+
+# Conclusion
+
+# New variable names
+
+```{r}
+# Read in data
+# na.strings = "No answer" simply means that answers coded in as "No answer" in the data is NA
+dat_vote <- read.csv("vote_parties.csv", na.strings = "No answer")
+
+names(dat_vote)[names(dat_vote) == "a5"] <- "PaperTime"
+names(dat_vote)[names(dat_vote) == "b1"] <- "PoInt"
+names(dat_vote)[names(dat_vote) == "b11"] <- "VoteLast"
+names(dat_vote)[names(dat_vote) == "b12"] <- "VoteParty"
+names(dat_vote)[names(dat_vote) == "c1"] <- "HapScale"
+names(dat_vote)[names(dat_vote) == "c5"] <- "Crime5year"
+names(dat_vote)[names(dat_vote) == "c15"] <- "HealthLvl"
+names(dat_vote)[names(dat_vote) == "c28"] <- "SweBorn"
+names(dat_vote)[names(dat_vote) == "c33"] <- "FSweBorn"
+names(dat_vote)[names(dat_vote) == "c35"] <- "MSweBorn"
+names(dat_vote)[names(dat_vote) == "d4"] <- "Spouse3year"
+names(dat_vote)[names(dat_vote) == "d6"] <- "Married"
+names(dat_vote)[names(dat_vote) == "d9"] <- "TotalChildren"
+names(dat_vote)[names(dat_vote) == "e4"] <- "OptLvl"
+names(dat_vote)[names(dat_vote) == "e5"] <- "PosLvl"
+names(dat_vote)[names(dat_vote) == "e7"] <- "SalLvl"
+names(dat_vote)[names(dat_vote) == "f1"] <- "FamSize"
+names(dat_vote)[names(dat_vote) == "f2"] <- "Gender"
+names(dat_vote)[names(dat_vote) == "f3"] <- "Bdate"
+names(dat_vote)[names(dat_vote) == "f5"] <- "Area"
+names(dat_vote)[names(dat_vote) == "f27"] <- "FormUnemp"
+names(dat_vote)[names(dat_vote) == "f30"] <- "TradeUn"
+names(dat_vote)[names(dat_vote) == "f32"] <- "IncLvl"
+summary(dat_vote$VoteParty)
+```
+
+
+
+
+
+
+
+
+
+
