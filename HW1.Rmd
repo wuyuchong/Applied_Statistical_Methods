@@ -11,6 +11,17 @@ output:
     number_sections: yes
 ---
 
+# Caution: Never copy the whole thing into the latest version from your own workspace
+
+# Reminders:
+
+1. Rearrange the plot (Ranking)
+
+***
+
+# Begin document
+
+
 \newpage
 
 \tableofcontents
@@ -34,11 +45,8 @@ library(dummies)
 
 # Data
 
-# Results
 
-# Conclusion
 
-# New variable names
 
 ```{r}
 # Read in data
@@ -60,7 +68,7 @@ names(dat)[names(dat) == "d6"] <- "Married"
 names(dat)[names(dat) == "d9"] <- "TotalChildren"
 names(dat)[names(dat) == "e4"] <- "OptLvl"
 names(dat)[names(dat) == "e5"] <- "PosLvl"
-names(dat)[names(dat) == "e7"] <- "SalLvl"
+names(dat)[names(dat) == "e7"] <- "SatLvl"
 names(dat)[names(dat) == "f1"] <- "FamSize"
 names(dat)[names(dat) == "f2"] <- "Gender"
 names(dat)[names(dat) == "f3"] <- "Bdate"
@@ -72,16 +80,176 @@ levels(dat$VoteParty)
 ```
 
 ```{r}
-dat %>%
-  filter(VoteParty != c("NOT APPLICABLE", "NO ANSWER", "DONT KNOW", "REFUSAL")) %>% 
+dat_t = dat
+
+dat_t$PaperTime = as.character(dat_t$PaperTime)
+dat_t$PaperTime[dat_t$PaperTime == "No time at all"] = 0
+dat_t$PaperTime[dat_t$PaperTime == "Less than 0,5 hour"] = 1
+dat_t$PaperTime[dat_t$PaperTime == "0,5 hour to 1 hour"] = 2
+dat_t$PaperTime[dat_t$PaperTime == "More than 1 hour, up to "] = 3
+dat_t$PaperTime[dat_t$PaperTime == "More than 1,5 hours, up "] = 4
+dat_t$PaperTime[dat_t$PaperTime == "More than 2 hours, up to"] = 5
+dat_t$PaperTime[dat_t$PaperTime == "More than 2,5 hours, up to"] = 6
+dat_t$PaperTime[dat_t$PaperTime == "More than 3 hours"] = 7
+dat_t$PaperTime[dat_t$PaperTime == "Don't know"] = 88
+
+dat_t$PoInt = as.character(dat_t$PoInt)
+dat_t$PoInt[dat_t$PoInt == "Very interested"] = 1
+dat_t$PoInt[dat_t$PoInt == "Quite interested"] = 2
+dat_t$PoInt[dat_t$PoInt == "Hardly interested"] = 3
+dat_t$PoInt[dat_t$PoInt == "Not at all interested"] = 4
+
+dat_t$VoteLast = as.character(dat_t$VoteLast)
+dat_t$VoteLast[dat_t$VoteLast == "Yes"] = 1
+dat_t$VoteLast[dat_t$VoteLast == "No"] = 0
+
+dat_t$HapScale = as.character(dat_t$HapScale)
+dat_t$HapScale[dat_t$HapScale == "Extremely happy"] = 10
+dat_t$HapScale[dat_t$HapScale == "Refusal"] = 99
+
+dat_t$HealthLvl = as.character(dat_t$HealthLvl)
+dat_t$HealthLvl[dat_t$HealthLvl == "Very good"] = 1
+dat_t$HealthLvl[dat_t$HealthLvl == "Good"] = 2
+dat_t$HealthLvl[dat_t$HealthLvl == "Fair"] = 3
+dat_t$HealthLvl[dat_t$HealthLvl == "Bad"] = 4
+dat_t$HealthLvl[dat_t$HealthLvl == "Very bad"] = 5
+
+dat_t$SweBorn = as.character(dat_t$SweBorn)
+dat_t$SweBorn[dat_t$SweBorn == "Yes"] = 1
+dat_t$SweBorn[dat_t$SweBorn == "No"] = 2
+dat_t$SweBorn[dat_t$SweBorn == "Don't know"] = 8
+
+dat_t$FSweBorn = as.character(dat_t$FSweBorn)
+dat_t$FSweBorn[dat_t$FSweBorn == "Yes"] = 1
+dat_t$FSweBorn[dat_t$FSweBorn == "No"] = 2
+dat_t$FSweBorn[dat_t$FSweBorn == "Don't know"] = 8
+
+dat_t$MSweBorn = as.character(dat_t$MSweBorn)
+dat_t$MSweBorn[dat_t$MSweBorn == "Yes"] = 1
+dat_t$MSweBorn[dat_t$MSweBorn == "No"] = 2
+dat_t$MSweBorn[dat_t$MSweBorn == "Don't know"] = 8
+
+dat_t$Crime5year = as.character(dat_t$Crime5year)
+dat_t$Crime5year[dat_t$Crime5year == "Yes"] = 1
+dat_t$Crime5year[dat_t$Crime5year == "No"] = 2
+
+dat_t$Spouse3year = as.character(dat_t$Spouse3year)
+dat_t$Spouse3year[dat_t$Spouse3year == "Yes"] = 1
+dat_t$Spouse3year[dat_t$Spouse3year == "No"] = 2
+
+dat_t$Married = as.character(dat_t$Married)
+dat_t$Married[dat_t$Married == "Yes"] = 1
+dat_t$Married[dat_t$Married == "No"] = 2
+
+dat_t$TotalChildren = as.character(dat_t$TotalChildren)
+dat_t$TotalChildren[dat_t$TotalChildren == "Not applicable"] = 0
+dat_t$TotalChildren[dat_t$TotalChildren == "1.000000"] = 1
+dat_t$TotalChildren[dat_t$TotalChildren == "2.000000"] = 2
+dat_t$TotalChildren[dat_t$TotalChildren == "3.000000"] = 3
+dat_t$TotalChildren[dat_t$TotalChildren == "4.000000"] = 4
+dat_t$TotalChildren[dat_t$TotalChildren == "5.000000"] = 5
+dat_t$TotalChildren[dat_t$TotalChildren == "6.000000"] = 6
+dat_t$TotalChildren[dat_t$TotalChildren == "7.000000"] = 7
+dat_t$TotalChildren[dat_t$TotalChildren == "8.000000"] = 8
+
+dat_t$OptLvl = as.character(dat_t$OptLvl)
+dat_t$OptLvl[dat_t$OptLvl == "Agree strongly"] = 1
+dat_t$OptLvl[dat_t$OptLvl == "Agree"] = 2
+dat_t$OptLvl[dat_t$OptLvl == "Neither agree nor disagr"] = 3
+dat_t$OptLvl[dat_t$OptLvl == "Disagree"] = 4
+dat_t$OptLvl[dat_t$OptLvl == "Disagree strongly"] = 5
+
+dat_t$PosLvl = as.character(dat_t$PosLvl)
+dat_t$PosLvl[dat_t$PosLvl == "Agree strongly"] = 1
+dat_t$PosLvl[dat_t$PosLvl == "Agree"] = 2
+dat_t$PosLvl[dat_t$PosLvl == "Neither agree nor disagr"] = 3
+dat_t$PosLvl[dat_t$PosLvl == "Disagree"] = 4
+dat_t$PosLvl[dat_t$PosLvl == "Disagree strongly"] = 5
+
+dat_t$SatLvl = as.character(dat_t$SatLvl)
+dat_t$SatLvl[dat_t$SatLvl == "Agree strongly"] = 1
+dat_t$SatLvl[dat_t$SatLvl == "Agree"] = 2
+dat_t$SatLvl[dat_t$SatLvl == "Neither agree nor disagr"] = 3
+dat_t$SatLvl[dat_t$SatLvl == "Disagree"] = 4
+dat_t$SatLvl[dat_t$SatLvl == "Disagree strongly"] = 5
+dat_t$SatLvl[dat_t$SatLvl == "Don't know"] = 88
+
+dat_t$Gender = as.character(dat_t$Gender)
+dat_t$Gender[dat_t$Gender == "Male"] = 1
+dat_t$Gender[dat_t$Gender == "Female"] = 2
+
+dat_t$FormUnemp = as.character(dat_t$FormUnemp)
+dat_t$FormUnemp[dat_t$FormUnemp == "Yes"] = 1
+dat_t$FormUnemp[dat_t$FormUnemp == "No"] = 2
+dat_t$FormUnemp[dat_t$FormUnemp == "Don't know"] = 88
+
+dat_t$TradeUn = as.character(dat_t$TradeUn)
+dat_t$TradeUn[dat_t$TradeUn == "Yes, currently"] = 1
+dat_t$TradeUn[dat_t$TradeUn == "Yes, previously"] = 2
+dat_t$TradeUn[dat_t$TradeUn == "No"] = 3
+dat_t$TradeUn[dat_t$TradeUn == "Don't know"] = 8
+
+dat_t$IncLvl = as.character(dat_t$IncLvl)
+dat_t$IncLvl[dat_t$IncLvl == "J"] = 1
+dat_t$IncLvl[dat_t$IncLvl == "R"] = 2
+dat_t$IncLvl[dat_t$IncLvl == "C"] = 3
+dat_t$IncLvl[dat_t$IncLvl == "M"] = 4
+dat_t$IncLvl[dat_t$IncLvl == "F"] = 5
+dat_t$IncLvl[dat_t$IncLvl == "S"] = 6
+dat_t$IncLvl[dat_t$IncLvl == "K"] = 7
+dat_t$IncLvl[dat_t$IncLvl == "P"] = 8
+dat_t$IncLvl[dat_t$IncLvl == "D"] = 9
+dat_t$IncLvl[dat_t$IncLvl == "H"] = 10
+dat_t$IncLvl[dat_t$IncLvl == "U"] = 11
+dat_t$IncLvl[dat_t$IncLvl == "N"] = 12
+dat_t$IncLvl[dat_t$IncLvl == "Refusal"] = 77
+dat_t$IncLvl[dat_t$IncLvl == "Don't know"] = 88
+
+dat_t$Area = as.character(dat_t$Area)
+dat_t$Area[dat_t$Area == "A big city"] = 1
+dat_t$Area[dat_t$Area == "Suburbs or outskirts of "] = 2
+dat_t$Area[dat_t$Area == "Town or small city"] = 3
+dat_t$Area[dat_t$Area == "Country village"] = 4
+dat_t$Area[dat_t$Area == "Farm or home in countrys"] = 5
+dat_t$Area[dat_t$Area == "Don't know"] = 8
+```
+
+# Descriptive Statistics
+
+1)In order to know how the voters voted in the last general election in Sweden, we draw a barplot of how many votes each party got. Since we are intrested in voters only this task, we do not take into account people who are not applicable, who refused to answer the survey, who do not know and who did not give an answer.
+
+```{r}
+dat %>% 
+  filter(VoteParty != "NOT APPLICABLE") %>% 
+  filter(VoteParty != "REFUSAL") %>% 
+  filter(VoteParty != "DONT KNOW") %>% 
+  filter(VoteParty != "NO ANSWER") %>% 
   ggplot(mapping = aes(x = VoteParty)) +
-  geom_bar() +
+  geom_bar(aes(y = (..count..)/sum(..count..), fill = factor(..x..))) +
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Percentage") +
+  guides(fill = "none") +
   coord_flip()
 ```
 
+We notice that the Social Democrats received the largest share of the votes, 32%. The left party got the least amount of votes with 6% of the total votes. It seems like most people either vote for the right wing or the left wing. The Centre party does not seem that popular. We also notice that people prefer parties that are not in either extreme; the left party, liberal party and the christian democrats are not popular compared to the social democrates and the conservative party. The Green party does not seem that popular as well, it got only 8% of the total votes. Overall, it seems like voters are more left leaning when voting to various parties.
 
 
 
 
 
 
+
+# Logit Model
+
+```{r}
+table = data.frame(column1 = c(1, 2, "text"), 
+                   column2 = c(4, 5, 6))
+kable(table, caption = "title here", digits = 2)
+
+```
+
+
+# Conclusion
+
+# Appendix
