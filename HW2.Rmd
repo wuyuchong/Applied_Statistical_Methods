@@ -1,0 +1,183 @@
+---
+title: "Homework Assignment 2"
+author: "Claes Kock, Yuchong Wu, Mayara Latrech"
+Date: "10/12/2019"
+header-includes:
+   - \usepackage{array}
+   - \usepackage{float}
+output:
+  pdf_document:
+    number_sections: yes
+---
+
+# Caution: Never copy the whole thing into the latest version from your own workspace
+
+# Example for making table:
+
+```{r eval=FALSE}
+table = data.frame(column1 = c(1, 2, "text"), 
+                   column2 = c(4, 5, 6))
+
+# Then for PDF:
+kable(table, caption = "title here", digits = 2)
+
+# For presentation:
+datatable(table)
+```
+
+# Reminders:
+
+1. Titles for all the plots and tables
+
+***
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE)
+library(knitr)
+library(ggplot2)
+library(tidyverse)
+library(semPlot)
+library(lavaan)
+```
+
+```{r}
+load("HolzingerSwineford1939.RData")
+dat = as.data.frame(df)
+dat
+```
+
+# Task 1
+
+First, imagine a context where you work in a specific area and
+should investigate certain latent variables.
+
+Specify and motivate the latent variables of interest to you. 
+
+Secondly, specify the indicator variables you would like to use to be able to model your latent variable. 
+
+This part should be at most one A4 in size and include a brief description of the context, the latent variables with motivation, and the manifest variables and how you expect them to relate to the latent variables.
+
+# Task 2
+
+The next task is to actually model such a situation using factor analysis. 
+
+Specific questions you need to answer for each data set are:
+
+1. What do you expect before estimating the model? Sign and size of the
+parameters, what correlations do you expect to find, etc?
+
+2. Fit a one factor model to the data. Do the data support this model?
+Motivate your answer.
+
+3. Fit a factor model with more than one factor to the data. Do the data
+support this model? Motivate your answer.
+
+4. Did you find a model that fits the data well? Which model is that?
+Did it correspond with your initial beliefs?
+
+5. For the fitted model:
+
+* Describe the model.
+* Present the model as a path diagram and in equation form.
+* Give an interpretation of the latent variable(s) of the model.
+* How did you assign a scale to the latent variable(s)?
+* Interpret the factor loadings of the model.
+* Are all observed variables equally strong indicators of the latent variable(s)?
+* What are the assumptions of the model?
+
+## Model
+
+```{r}
+model <- '
+   # latent variables
+     men_abi =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+   # regressions
+     men_abi ~ ageyr + grade + sex
+   # residual covariances
+'
+
+
+fit = cfa(model, data=dat)
+#fit = sem(model,data=dat)
+
+
+
+
+summary(fit)
+semPaths(fit)
+semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+         edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         nCharNodes=0, residuals =TRUE,
+         nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         layout="tree2",curvePivot=TRUE)
+
+```
+
+```{r}
+model <- '
+   # latent variables
+     geo_abi =~ x1 + x2 + x3
+     lan_abi =~ x4 + x5 + x6 
+     alg_abi =~ x7 + x8 + x9
+   # regressions
+     geo_abi ~ ageyr + grade + sex
+     lan_abi ~ ageyr + grade + sex
+     alg_abi ~ ageyr + grade + sex
+   # residual covariances
+'
+
+
+fit = cfa(model, data=dat)
+#fit = sem(model,data=dat)
+
+
+
+
+summary(fit)
+semPaths(fit)
+semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+         edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         nCharNodes=0, residuals =TRUE,
+         nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         layout="tree2",curvePivot=TRUE)
+
+```
+
+```{r}
+model <- '
+   # latent variables
+     geo_abi =~ x1 + x2 + x3
+     lan_abi =~ x4 + x5 + x6 
+     alg_abi =~ x7 + x8 + x9
+   # regressions
+     geo_abi ~ ageyr + grade
+     lan_abi ~ ageyr + grade
+     alg_abi ~ ageyr + grade
+   # residual covariances
+'
+
+
+fit = cfa(model, data=dat, group = "sex")
+#fit = sem(model,data=dat)
+
+
+
+
+summary(fit)
+semPaths(fit)
+semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+         edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         nCharNodes=0, residuals =TRUE,
+         nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         layout="tree2",curvePivot=TRUE)
+
+```

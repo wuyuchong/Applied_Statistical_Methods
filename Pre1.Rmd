@@ -1,0 +1,263 @@
+---
+title: "Presentation for HW1 - Vote"
+author: 'Claes Kock, Yuchong Wu, Mayara Latrech'
+date: '18/12/2019'
+output:
+  revealjs::revealjs_presentation:
+    background_transition: slide
+    reveal_plugins:
+    - zoom
+    - menu
+    self_contained: no
+    theme: "sky"
+    transition: convex
+    reveal_options:
+      slideNumber: true
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE)
+library(knitr)
+library(ggplot2)
+library(tidyverse)
+library(dummies)
+library(DT)
+library(lmtest)
+
+dat_vote <- read.csv("vote_parties.csv", na.strings = "No answer")
+dat <- read.csv("vote_parties.csv", na.strings = c("No answer", "Don't know"))
+dat <- na.omit(dat)
+names(dat)[names(dat) == "a5"] <- "PaperTime"
+names(dat)[names(dat) == "b1"] <- "PoInt"
+names(dat)[names(dat) == "b11"] <- "VoteLast"
+names(dat)[names(dat) == "b12"] <- "VoteParty"
+names(dat)[names(dat) == "c1"] <- "HapScale"
+names(dat)[names(dat) == "c5"] <- "Crime5year"
+names(dat)[names(dat) == "c15"] <- "HealthLvl"
+names(dat)[names(dat) == "c28"] <- "SweBorn"
+names(dat)[names(dat) == "c33"] <- "FSweBorn"
+names(dat)[names(dat) == "c35"] <- "MSweBorn"
+names(dat)[names(dat) == "d4"] <- "Spouse3year"
+names(dat)[names(dat) == "d6"] <- "Married"
+names(dat)[names(dat) == "d9"] <- "TotalChildren"
+names(dat)[names(dat) == "e4"] <- "OptLvl"
+names(dat)[names(dat) == "e5"] <- "PosLvl"
+names(dat)[names(dat) == "e7"] <- "SatLvl"
+names(dat)[names(dat) == "f1"] <- "FamSize"
+names(dat)[names(dat) == "f2"] <- "Gender"
+names(dat)[names(dat) == "f3"] <- "Bdate"
+names(dat)[names(dat) == "f5"] <- "Area"
+names(dat)[names(dat) == "f27"] <- "FormUnemp"
+names(dat)[names(dat) == "f30"] <- "TradeUn"
+names(dat)[names(dat) == "f32"] <- "IncLvl"
+levels(dat$VoteParty)
+
+
+dat_t = dat
+
+dat_t$PaperTime = as.character(dat_t$PaperTime)
+dat_t$PaperTime[dat_t$PaperTime == "No time at all"] = 0
+dat_t$PaperTime[dat_t$PaperTime == "Less than 0,5 hour"] = 1
+dat_t$PaperTime[dat_t$PaperTime == "0,5 hour to 1 hour"] = 2
+dat_t$PaperTime[dat_t$PaperTime == "More than 1 hour, up to "] = 3
+dat_t$PaperTime[dat_t$PaperTime == "More than 1,5 hours, up "] = 4
+dat_t$PaperTime[dat_t$PaperTime == "More than 2 hours, up to"] = 5
+dat_t$PaperTime[dat_t$PaperTime == "More than 2,5 hours, up to"] = 6
+dat_t$PaperTime[dat_t$PaperTime == "More than 2,5 hours, up "] = 6
+dat_t$PaperTime[dat_t$PaperTime == "More than 3 hours"] = 7
+dat_t$PaperTime[dat_t$PaperTime == "Don't know"] = 88
+
+dat_t$PoInt = as.character(dat_t$PoInt)
+dat_t$PoInt[dat_t$PoInt == "Very interested"] = 1
+dat_t$PoInt[dat_t$PoInt == "Quite interested"] = 2
+dat_t$PoInt[dat_t$PoInt == "Hardly interested"] = 3
+dat_t$PoInt[dat_t$PoInt == "Not at all interested"] = 4
+dat_t$PoInt[dat_t$PoInt == "Don't know"] = 88
+
+dat_t$VoteLast = as.character(dat_t$VoteLast)
+dat_t$VoteLast[dat_t$VoteLast == "Yes"] = 1
+dat_t$VoteLast[dat_t$VoteLast == "No"] = 2
+dat_t$VoteLast[dat_t$VoteLast == "Not eligible to vote"] = 3
+dat_t$VoteLast[dat_t$VoteLast == "Don't know"] = 88
+
+dat_t$HapScale = as.character(dat_t$HapScale)
+dat_t$HapScale[dat_t$HapScale == "Extremely unhappy"] = 0
+dat_t$HapScale[dat_t$HapScale == "Extremely happy"] = 10
+dat_t$HapScale[dat_t$HapScale == "Refusal"] = 99
+dat_t$HapScale[dat_t$HapScale == "Don't know"] = 88
+
+dat_t$HealthLvl = as.character(dat_t$HealthLvl)
+dat_t$HealthLvl[dat_t$HealthLvl == "Very good"] = 1
+dat_t$HealthLvl[dat_t$HealthLvl == "Good"] = 2
+dat_t$HealthLvl[dat_t$HealthLvl == "Fair"] = 3
+dat_t$HealthLvl[dat_t$HealthLvl == "Bad"] = 4
+dat_t$HealthLvl[dat_t$HealthLvl == "Very bad"] = 5
+dat_t$HealthLvl[dat_t$HealthLvl == "Don't know"] = 88
+
+dat_t$SweBorn = as.character(dat_t$SweBorn)
+dat_t$SweBorn[dat_t$SweBorn == "Yes"] = 1
+dat_t$SweBorn[dat_t$SweBorn == "No"] = 2
+dat_t$SweBorn[dat_t$SweBorn == "Don't know"] = 88
+
+dat_t$FSweBorn = as.character(dat_t$FSweBorn)
+dat_t$FSweBorn[dat_t$FSweBorn == "Yes"] = 1
+dat_t$FSweBorn[dat_t$FSweBorn == "No"] = 2
+dat_t$FSweBorn[dat_t$FSweBorn == "Don't know"] = 88
+
+dat_t$MSweBorn = as.character(dat_t$MSweBorn)
+dat_t$MSweBorn[dat_t$MSweBorn == "Yes"] = 1
+dat_t$MSweBorn[dat_t$MSweBorn == "No"] = 2
+dat_t$MSweBorn[dat_t$MSweBorn == "Don't know"] = 88
+
+dat_t$Crime5year = as.character(dat_t$Crime5year)
+dat_t$Crime5year[dat_t$Crime5year == "Yes"] = 1
+dat_t$Crime5year[dat_t$Crime5year == "No"] = 2
+dat_t$Crime5year[dat_t$Crime5year == "Don't know"] = 88
+
+dat_t$Spouse3year = as.character(dat_t$Spouse3year)
+dat_t$Spouse3year[dat_t$Spouse3year == "Yes"] = 1
+dat_t$Spouse3year[dat_t$Spouse3year == "No"] = 2
+dat_t$Spouse3year[dat_t$Spouse3year == "Don't know"] = 88
+
+dat_t$Married = as.character(dat_t$Married)
+dat_t$Married[dat_t$Married == "Yes"] = 1
+dat_t$Married[dat_t$Married == "No"] = 2
+
+dat_t$TotalChildren = as.character(dat_t$TotalChildren)
+dat_t$TotalChildren[dat_t$TotalChildren == "Not applicable"] = 0
+dat_t$TotalChildren[dat_t$TotalChildren == "1.000000"] = 1
+dat_t$TotalChildren[dat_t$TotalChildren == "2.000000"] = 2
+dat_t$TotalChildren[dat_t$TotalChildren == "3.000000"] = 3
+dat_t$TotalChildren[dat_t$TotalChildren == "4.000000"] = 4
+dat_t$TotalChildren[dat_t$TotalChildren == "5.000000"] = 5
+dat_t$TotalChildren[dat_t$TotalChildren == "6.000000"] = 6
+dat_t$TotalChildren[dat_t$TotalChildren == "7.000000"] = 7
+dat_t$TotalChildren[dat_t$TotalChildren == "8.000000"] = 8
+dat_t$TotalChildren[dat_t$TotalChildren == "9.000000"] = 9
+dat_t$TotalChildren[dat_t$TotalChildren == "10.000000"] = 10
+dat_t$TotalChildren[dat_t$TotalChildren == "11.000000"] = 11
+dat_t$TotalChildren[dat_t$TotalChildren == "12.00000"] = 12
+
+dat_t$OptLvl = as.character(dat_t$OptLvl)
+dat_t$OptLvl[dat_t$OptLvl == "Agree strongly"] = 1
+dat_t$OptLvl[dat_t$OptLvl == "Agree"] = 2
+dat_t$OptLvl[dat_t$OptLvl == "Neither agree nor disagr"] = 3
+dat_t$OptLvl[dat_t$OptLvl == "Disagree"] = 4
+dat_t$OptLvl[dat_t$OptLvl == "Disagree strongly"] = 5
+dat_t$OptLvl[dat_t$OptLvl == "Don't know"] = 88
+
+dat_t$PosLvl = as.character(dat_t$PosLvl)
+dat_t$PosLvl[dat_t$PosLvl == "Agree strongly"] = 1
+dat_t$PosLvl[dat_t$PosLvl == "Agree"] = 2
+dat_t$PosLvl[dat_t$PosLvl == "Neither agree nor disagr"] = 3
+dat_t$PosLvl[dat_t$PosLvl == "Disagree"] = 4
+dat_t$PosLvl[dat_t$PosLvl == "Disagree strongly"] = 5
+dat_t$PosLvl[dat_t$PosLvl == "Don't know"] = 88
+
+dat_t$SatLvl = as.character(dat_t$SatLvl)
+dat_t$SatLvl[dat_t$SatLvl == "Agree strongly"] = 1
+dat_t$SatLvl[dat_t$SatLvl == "Agree"] = 2
+dat_t$SatLvl[dat_t$SatLvl == "Neither agree nor disagr"] = 3
+dat_t$SatLvl[dat_t$SatLvl == "Disagree"] = 4
+dat_t$SatLvl[dat_t$SatLvl == "Disagree strongly"] = 5
+dat_t$SatLvl[dat_t$SatLvl == "Don't know"] = 88
+
+dat_t$Gender = as.character(dat_t$Gender)
+dat_t$Gender[dat_t$Gender == "Male"] = 1
+dat_t$Gender[dat_t$Gender == "Female"] = 2
+
+dat_t$FormUnemp = as.character(dat_t$FormUnemp)
+dat_t$FormUnemp[dat_t$FormUnemp == "Yes"] = 1
+dat_t$FormUnemp[dat_t$FormUnemp == "No"] = 2
+dat_t$FormUnemp[dat_t$FormUnemp == "Don't know"] = 88
+
+dat_t$TradeUn = as.character(dat_t$TradeUn)
+dat_t$TradeUn[dat_t$TradeUn == "Yes, currently"] = 1
+dat_t$TradeUn[dat_t$TradeUn == "Yes, previously"] = 2
+dat_t$TradeUn[dat_t$TradeUn == "No"] = 3
+dat_t$TradeUn[dat_t$TradeUn == "Don't know"] = 88
+
+dat_t$IncLvl = as.character(dat_t$IncLvl)
+dat_t$IncLvl[dat_t$IncLvl == "J"] = 1
+dat_t$IncLvl[dat_t$IncLvl == "R"] = 2
+dat_t$IncLvl[dat_t$IncLvl == "C"] = 3
+dat_t$IncLvl[dat_t$IncLvl == "M"] = 4
+dat_t$IncLvl[dat_t$IncLvl == "F"] = 5
+dat_t$IncLvl[dat_t$IncLvl == "S"] = 6
+dat_t$IncLvl[dat_t$IncLvl == "K"] = 7
+dat_t$IncLvl[dat_t$IncLvl == "P"] = 8
+dat_t$IncLvl[dat_t$IncLvl == "D"] = 9
+dat_t$IncLvl[dat_t$IncLvl == "H"] = 10
+dat_t$IncLvl[dat_t$IncLvl == "U"] = 11
+dat_t$IncLvl[dat_t$IncLvl == "N"] = 12
+dat_t$IncLvl[dat_t$IncLvl == "Refusal"] = 77
+dat_t$IncLvl[dat_t$IncLvl == "Don't know"] = 88
+
+dat_t$Area = as.character(dat_t$Area)
+dat_t$Area[dat_t$Area == "A big city"] = 1
+dat_t$Area[dat_t$Area == "Suburbs or outskirts of "] = 2
+dat_t$Area[dat_t$Area == "Town or small city"] = 3
+dat_t$Area[dat_t$Area == "Country village"] = 4
+dat_t$Area[dat_t$Area == "Farm or home in countrys"] = 5
+dat_t$Area[dat_t$Area == "Don't know"] = 88
+```
+
+# Introduction
+
+---
+
+What is task about?
+
+
+# Theory - logit/probit
+
+
+# Our dataset
+
+
+## Election result
+
+Voting data, Election 2006
+
+```{r}
+dat %>% 
+  filter(VoteParty != "NOT APPLICABLE") %>% 
+  filter(VoteParty != "REFUSAL") %>% 
+  filter(VoteParty != "DONT KNOW") %>% 
+  filter(VoteParty != "NO ANSWER") %>% 
+  count(VoteParty) %>%
+  mutate(VoteParty = fct_reorder(VoteParty, n, .desc = FALSE)) %>%
+  ggplot() +
+  geom_bar(aes(x = VoteParty, y = (n)/sum(n), fill = VoteParty), stat = 'identity') +
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Percentage") +
+  guides(fill = "none") +
+  coord_flip() +
+  theme(panel.background = element_blank())
+```
+
+# Logit Model
+
+What variables have we used?
+
+## Interpretations
+
+## Predictions
+
+We play around with values!
+
+# Likelihood Ratio-test
+
+TEST
+
+## Comparison between observed and expected
+
+How are they different?
+
+# Probit Model
+
+## Comparison between observed and expected
+
+How are they different?
+
+# Conclusion
