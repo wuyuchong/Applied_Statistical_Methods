@@ -211,6 +211,15 @@ What is task about?
 
 # Theory - logit/probit
 
+$$P(X=1|X_1,X_2,...,X_k)=F(\beta_0+\beta_1X_1+...+\beta_kX_k) $$
+
+Where,
+
+$$F(x)=\frac{1}{1+e^{-x}}$$
+
+$\beta_0,\beta_1,..,\beta_k$ are the parameters of the model to be estimated.
+
+$X_1,X_2,...,X_k$ are the variables and the dependant variable $X$ is "social democrats" in our dataset.
 
 # Our dataset
 

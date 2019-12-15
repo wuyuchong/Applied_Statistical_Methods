@@ -50,6 +50,8 @@ library(lavaan)
 load("HolzingerSwineford1939.RData")
 dat = as.data.frame(df)
 dat
+dat_t = dat 
+dat_t$school = as.numeric(dat_t$school)
 ```
 
 # Task 1
@@ -158,14 +160,14 @@ model <- '
      lan_abi =~ x4 + x5 + x6 
      alg_abi =~ x7 + x8 + x9
    # regressions
-     geo_abi ~ ageyr + grade
-     lan_abi ~ ageyr + grade
-     alg_abi ~ ageyr + grade
+     geo_abi ~ ageyr + grade + school + agemo
+     lan_abi ~ ageyr + grade + school + agemo
+     alg_abi ~ ageyr + grade + school + agemo
    # residual covariances
 '
 
 
-fit = cfa(model, data=dat, group = "sex")
+fit = cfa(model, data=dat_t)
 #fit = sem(model,data=dat)
 
 

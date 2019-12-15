@@ -10,31 +10,24 @@ output:
     number_sections: yes
 ---
 
-# Caution: Never copy the whole thing into the latest version from your own workspace
+# REMINDER
 
-# Example for making table:
-
-```{r eval=FALSE}
-table = data.frame(column1 = c(1, 2, "text"), 
-                   column2 = c(4, 5, 6))
-
-# Then for PDF:
-kable(table, caption = "title here", digits = 2)
-
-# For presentation:
-datatable(table)
-```
-
-# Reminders:
-
-1. Rearrange the barplot (Ranking)
-2. Titles for all the plots and tables
-3. Change the cover
-4. Abstract, Introduction and Conclusion
+1. The result part is blank - fixed, removed result
+2. The name for the coefficient tables are wrong. 
+3. The coefficient table for PROBIT is wrong at the area category. - fixed
+4. Put the coefficient tables into the interpretation part of the presentation.
+5. Put the selected variables tables into the dataset part of the presentation.
+6. Change the layout of the presentation. We just need one vertical section for each person. Thus, there should be 3 columns except the first slide in total.
 
 ***
 
 # Begin document
+
+# Abstract
+
+For this assignment, we tried to figure out what variables impact the choice of voting for the Social Democratic Party of Sweden. The thesis is based on a dataset from the European Social Survey from 2006. We selected variables and established Logit and Probit models. We found that most of our variables were significant and constant scale for the Likert variables. Most of our variables were Likert variables, except for one.
+
+The accuracy of our logit model was 61.1%, while the accuracy of our probit model was slightly higher, at 61.3%. Thus, we conclude that the probit model is better than the logit model, but the difference is very small.
 
 
 \newpage
@@ -61,16 +54,17 @@ library(e1071)
 
 # Abstract
 
-For this assignment, we have tried to predict what variables impact the choice of voting for the Social Democratic Party of Sweden. The assignment is based on data from the European Social Survey from 2006. We modeled this using selected variables with Logit and Probit models. We found that most of our variables were significant and constant. Most of our variables were Likert variables, save for one.
-The accuracy of our logit model was 61.1%, while the accuracy for our probit model was slightly higher, at 61.3%. Thus, we conclude that the probit model is better than the logit model, but the difference is very small.
+For this assignment, we tried to figure out what variables impact the choice of voting for the Social Democratic Party of Sweden. The thesis is based on a dataset from the European Social Survey from 2006. We selected variables and established Logit and Probit models. We found that most of our variables were significant and constant scale for the Likert variables. Most of our variables were Likert variables, except for one.
+
+The accuracy of our logit model was 61.1%, while the accuracy of our probit model was slightly higher, at 61.3%. Thus, we conclude that the probit model is better than the logit model, but the difference is very small.
+
+\newpage
 
 # Introduction
 
 Sweden has many political parties. The purpose of this project is to use statistical tools to predict voting behavior in Sweden. To do that, we try to predict whether an individual would vote for The Social Democrats based on known variables. We get a data-set that contains information about 1927 such as, their political interested if they are Swedish born or even the time they spend reading newspapers. Throughout our work, we apply some transformation to this data-set and choose what we think are important variables. After that, we will feed those variables into a model: we will use probit and logit models. We will also apply the likelihood ratio test to determine if our variables are Lickert variables or not. Finally, we will predict if the individuals would vote for the Social Democrats or not. The model that has the best predictions would be the best.
 
-
-
-
+\newpage
 
 # Theory
 
@@ -88,6 +82,8 @@ The probit model is similar to the logit model, but uses the CDF form the normal
 
 $$P(X=1|X_1,X_2,...,X_k)=F(\beta_0+\beta_1X_1+...+\beta_kX_k) $$
 Where, $F(*)$ is the CDF from the normal distribution.
+
+\newpage
 
 # Data
 
@@ -124,7 +120,6 @@ names(dat)[names(dat) == "f5"] <- "Area"
 names(dat)[names(dat) == "f27"] <- "FormUnemp"
 names(dat)[names(dat) == "f30"] <- "TradeUn"
 names(dat)[names(dat) == "f32"] <- "IncLvl"
-levels(dat$VoteParty)
 ```
 
 ```{r}
@@ -278,14 +273,13 @@ dat_t$Area[dat_t$Area == "Farm or home in countrys"] = 5
 dat_t$Area[dat_t$Area == "Don't know"] = 88
 ```
 
+\newpage
 
-# Result
-
-# 1) Descriptive Statistics
+# Descriptive Statistics
 
 1)In order to know how the voters voted in the last general election in Sweden, we draw a barplot of how many votes each party got. Since we are intrested in voters only this task, we do not take into account people who are not applicable, who refused to answer the survey, who do not know and who did not give an answer.
 
-```{r}
+```{r out.width="80%"}
 dat %>% 
   filter(VoteParty != "NOT APPLICABLE") %>% 
   filter(VoteParty != "REFUSAL") %>% 
@@ -304,22 +298,32 @@ dat %>%
 
 We notice that the Social Democrats received the largest share of the votes, 32%. The left party got the least amount of votes with 6% of the total votes. It seems like most people either vote for the right wing or the left wing. The Centre party does not seem that popular. We also notice that people prefer parties that are not in either extreme; the left party, liberal party and the christian democrats are not popular compared to the social democrates and the conservative party. The Green party does not seem that popular as well, it got only 8% of the total votes. Overall, it seems like voters are more left leaning when voting to various parties
 
+\newpage
 
+## Logit model
 
-
-## 2) Logit model
-
-We have too much data and will have to restrict the amount of variables we use in our logit-model. We have selected a couple variables which we think will have a high impact
+We have too many variables and will have to restrict the number of variables we use in our logit-model. We have selected a couple of variables which we think will have a high impact
 
 1) We expect trade union members to be more likely on average to vote SocDem, due to the symbiotic relationship between labor and SocDem in Sweden, especially in 2006. However, due to how the variables are coded, we expect this to be a negative influence on voting SocDem since the higher values are for former members and non-members.
 
-2) Political interest could be a positve correlation, since the social democrats have been a major force in swedish politics for decades, and a high political interest could increase the chance to vote overall, instead of the individual staying at home due to having no interest in politics. 
+2) The variable political interest could be a positive correlation, since the social democrats have been a major force in Swedish politics for decades, and a high political interest could increase the chance to vote overall, instead of the individual staying at home due to having no interest in politics. However, high political interest is a low value for this variable, so we expect this variable to be negative.
 
-3) A high family size is a socio-demographic factor which is often correlated with working class households - we expect larger households to have a higher chance to vote for SocDem for this reason. 
+3) High family size is a socio-demographic factor which is often correlated with working-class households - we expect larger households to have a higher chance to vote for SocDem for this reason. 
 
-4) Finally, the typ of area that the individual is living in could also be a positive impact wether they vote SocDem, since a lot of industry is spread out over the smaller cities and countryside, where as cities might be expected to have a higher chance to vote for liberal parties.
+4) Finally, the type of area that the individual is living in could also be a positive impact whether they vote SocDem since a lot of industry is spread out over the smaller cities and countryside, whereas cities might be expected to have a higher chance to vote for liberal parties.
+
 
 ```{r}
+
+table = data.frame(VarName = c("TradeUn", "PoInt", "FamSize", "Area"),
+                   Measure = c("Trade Union membership", "Political interest", "Size of family", "Urbanisation"),
+                   ExpEffect = c("Neg.", "Neg.", "Pos.", "Pos."))
+
+kable(table, caption = "Chosen variables", digits = 2)
+
+```
+
+```{r echo=FALSE}
 
 dat_t$PoInt <- as.numeric(dat_t$PoInt)
 dat_t$TradeUn <- as.numeric(dat_t$TradeUn)
@@ -329,14 +333,19 @@ dat_t$Area <- as.numeric(dat_t$Area)
 m <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+Area, data = dat_t, 
          family = binomial(link='logit'))
 
-summary(m)
-
 # Getting log likelihood value (for test of likert restriction)
-logLik(m)
+```
+
+```{r}
+table2 = data.frame(Coefficients = c("Intercept", "PoInt", "TradeUn", "FamSize", "Area"),
+                   Estimate = c(-0.50969, 0.17109, -0.53338 , -0.10878, 0.06648),
+                   Significant = c("-", "Yes", "Yes", "Yes", "No"))
+
+kable(table2, caption = "Logit Model", digits = 2)
 ```
 
 
-## 3.1) Intepretation of parameters
+## Intepretation of parameters
 
 After estimating our model, we obtain $\hat\beta_0,...,\hat\beta_{4}$ estimates of the parameters of the model. $\hat\beta_0,...,\hat\beta_{3}$ are significant and $\hat\beta_{4}$ is not significant.
 - For every one unit increase in the Political Intrest, the log odds of voting for the Social democrates increases by `r m$coefficients[2]`, holding other variables constant.
@@ -344,23 +353,24 @@ After estimating our model, we obtain $\hat\beta_0,...,\hat\beta_{4}$ estimates 
 - For every one unit increase in family size, the log odds of voting for the Social democrates decreases by `r m$coefficients[4]`, holding other variables constant.
 - The parameter for the variable Area is not significant so it does not contribute any explanatory power.
  
-## 3.2) Picking one sample point
+\newpage
+ 
+## Picking one sample point
 
 ```{r}
 preds <- predict.glm(m, dat_t, type="response")
 ```
 
-
 Let us now try to choose one sample point and calculate the probability of the chosen individual to vote for the Social democrats, if we choose the $18^{th}$ individual for example, the probability stemmed from the model would be `r preds[18]`.
 
-```{r}
+```{r eval=FALSE}
 # Predict individ 18
 id18 = dat_t[18, ]
 # response returns predictions as probability (not log odds)
 pred1 <- predict.glm(m, id18, type="response")
 
 # change a value of id15 to
-id18$PoInt = 1
+id18$PoInt = 2
 pred2 = predict.glm(m, id18, type="response")
 
 # Difference in probability 
@@ -370,24 +380,24 @@ pred1-pred2
 We want to see what happens when we manipulate the regressors of a single individual. For that purpose, we have picked out individual #18 from all the observations. This individual is “quite interested” in politics. We decided to change this value to observe how this affects the probability of voting SocDem. We can see a 3.39% increase in probability when we raise the level of interest in politics from “2” to “1”. When we lower the value to “3”, we instead get a -3.64% decrease in probability. Finally “4” gives us a decrease of -7.51%. Thus, when predicting probability, it would seem that a higher political interest has a higher correlation with voting SocDem if we apply the results from looking at 1 individual on the entire dataset.
 
 
-```{r}
+```{r eval=FALSE}
 # Predict individ 18
 id18 = dat_t[18, ]
 # response returns predictions as probability (not log odds)
 pred3 <- predict.glm(m, id18, type="response")
 
 # change a value of id15 to
-id18$TradeUn = 3
+id18$TradeUn = 2
 pred4 = predict.glm(m, id18, type="response")
 
 # Difference in probability 
 pred3-pred4
 ```
 
-Individual #18 is also a current member of a trade union. We increase the value of the var TradeUn to "2", which means he's a former member. According to our prediction, this makes him 9.67% more likely to vote SocDem. If we increase it further to "3", which means he's not a member, #18 is 16.6% more likely to vote SocDem. This might be because of the relationship between being a trade union member and having a high value in the variable TradeUn in inverted, the higher value instead being given to individuals that are not members. 
+Individual #18 is also a current member of a trade union. We increase the value of the var TradeUn to "2", which means he's a former member. According to our prediction, this makes him 9.67% more likely to vote SocDem. If we increase it further to "3", which means he's not a member, #18 is 16.6% more likely to vote SocDem. This is because of the relationship between being a trade union member and having a high value in the variable TradeUn is inverted, the higher value instead being given to individuals that are not members.
 
 
-```{r}
+```{r eval=FALSE}
 # Predict individ 18
 id18 = dat_t[18, ]
 # response returns predictions as probability (not log odds)
@@ -395,21 +405,30 @@ pred5 <- predict.glm(m, id18, type="response")
 
 
 # change a value of id18 to
-id18$FamSize = 6
+id18$FamSize = 5
 pred6 = predict.glm(m, id18, type="response")
 
 # Difference in probability 
 pred5-pred6
 ```
 
-individual #18 has a family size of 3, a spouse and a child. We decrease the size of this family to just containing 1 member, to see how this affects the likelihood to vote for SocDem. This will allow us to see the change in probability when looking at an individual who is single compared to a member of a family. From our prediction, the change in probability is -4.67%. Similarly, individuals from families of a size of 2, i.e. a single parent or 2 spouses, gives a change in probability of -2.29%. If we instead increase from 3 to 4 members, we get an increase of 2.18%. This keeps increasing the more members above 3 we add - an individual from a family of 6 members has a probability increase of 6.24% for example. This might be because working-class households (which are probably more likely to vote SocDem) trend towards having larger families, and these households, in turn, form a large part of the SocDem voters.
+individual #18 has a familiy size of 3, a spouse and a child. We decrease the size of this family to just containing 1 member, in order to see how this affects the likelihood to vote for SocDem. This will allow us to see the change in probability when looking at a individual who is single compared to a member of a family. From our prediction, the change in probability is -4.67%. Similarly, individuals from families of a size of 2, i.e. a single parent or 2 spouses, gives a change in probability of -2.29%. If we instead increase from 3 to 4 members, we get an increase of 2.18%. This keeps increasing the more members above 3 we add - an individual from a family of 6 members has a probability increase of 6.24% for example. This might be because working class households (which are probably more likely to vote SocDem) trend towards having larger families, and these households in turn form  a large part of the SocDem voters.
 
-To be generalized, when interpreting the change of possibility of voting for the democratic party when we change the value of the explanatory variables on individual observation, we always keep all the other explanatory variables as what it originally was. However, when we interpret the change of possibility for the observations altogether, we usually hold other variables at their means or medians for continuous variables and base level for categorical variables.
+```{r}
+table3 = data.frame(Nr = c(1, 2, 3, 4, 5),PoInt = c(0.03394278, 0, -0.03646351, -0.0751499 , NA),
+                   TradeUn = c(0, 0.09676355, 0.1668725, NA, NA),
+                   FamSize = c(-0.04676795, -0.0229091 , 0, 0.02188785, 0.04270068 ))
 
-## 4) Likelihood Ratio test
+kable(table3, caption = "Changes in individual #18", digits = 2)
+```
 
-### 1
-We split the Political Intrest into dummy variables, now we have two models; the first one has Political intrest, Membership in the Trade Union, Family size and are, the second one has those same variables but Political Interest is split into dummy variables. We then apply the Likelihood ratio test.
+\newpage
+
+## Likelihood Ratio test
+
+### PoInt
+
+We split the Political Intrest into dummy variables, now we have two models; the first one has Political interest, Membership in the Trade Union, Family size and are, the second one has those same variables but Political Interest is split into dummy variables. We then apply the Likelihood ratio test.
 
 ```{r}
 
@@ -417,17 +436,14 @@ We split the Political Intrest into dummy variables, now we have two models; the
 m1 <- glm(as.factor(socialdemocrats) ~ as.factor(PoInt)+TradeUn+FamSize+Area, data = dat_t, 
          family = binomial(link='logit'))
 
-summary(m1)
-
 
 lr = lrtest(m, m1)
-lr
 ```
 
 
 - Hypothesis:
-  $H_0$: The likert variable: Policial Intrest has a constant scale
-  $H_1$: The likert variable: Policial Intrest does not have a constant scale
+  $H_0$: The Likert variable: Policial Intrest has a constant scale
+  $H_1$: The Likert variable: Policial Intrest does not have a constant scale
 - Significance level: $\alpha=0.05$
 - Estimators: $\hat\beta_1,\hat{\beta_1^2},\hat{\beta_1^3},\hat{\beta_1^4}$
 - Assumptions: Large T
@@ -435,19 +451,21 @@ lr
 $LR=-2\ln \left[{\frac {\sup _{\theta \in \Theta _{0}}{\mathcal {L}}(\theta )}{\sup _{\theta \in \Theta }{\mathcal {L}}(\theta )}}\right] \sim \mathcal {X}^2$
 - Decision rule and figure:
 We reject the null hypothesis if $LR>\mathcal {X}^2_{\alpha,2}$ or if $p-value<0.05$
-```{r}
+
+```{r fig.cap="Chisquare Distribution", out.width="60%", fig.align="center"}
 dist_chisq(p = 0.05, deg.f = 2)
 ```
 
 - Calculations and decision:
   p-value= `r lr[2,5] `>0.05. So we do not reject $H_0$.
 - Conclusion:
-At the 5% significance level, we fail to reject the null that the likert variable: Policial Intrest has a constant scale.
+At the 5% significance level, we fail to reject the null that the Likert variable: Policial Intrest has a constant scale.
 
+\newpage
 
-### 2
+### TradeUn
 
-We split the membership in the trade union into dummy variables, now we have two models; the first one has Political intrest, Membership in the Trade Union, Family size and are, the second one has those same variables but Membership in the Trade Union is split into dummy variables. We then apply the Likelihood ratio test.
+We split the membership in the trade union into dummy variables, now we have two models; the first one has Political interest, Membership in the Trade Union, Family size and are, the second one has those same variables but Membership in the Trade Union is split into dummy variables. We then apply the Likelihood ratio test.
 
 ```{r}
 
@@ -455,11 +473,9 @@ We split the membership in the trade union into dummy variables, now we have two
 m1 <- glm(as.factor(socialdemocrats) ~ PoInt+as.factor(TradeUn)+FamSize+Area, data = dat_t, 
          family = binomial(link='logit'))
 
-summary(m1)
 
 
 lr = lrtest(m, m1)
-lr
 ```
 
 
@@ -473,19 +489,21 @@ lr
 $LR=-2\ln \left[{\frac {\sup _{\theta \in \Theta _{0}}{\mathcal {L}}(\theta )}{\sup _{\theta \in \Theta }{\mathcal {L}}(\theta )}}\right] \sim \mathcal {X}^2$
 - Decision rule and figure:
 We reject the null hypothesis if $LR>\mathcal {X}^2_{\alpha,1}$ or if $p-value<0.05$
-```{r}
+
+```{r fig.cap="Chisquare Distribution", out.width="60%", fig.align="center"}
 dist_chisq(p = 0.05, deg.f = 1)
 ```
 
 - Calculations and decision:
   p-value= `r lr[2,5] `>0.05. So we do not reject $H_0$.
 - Conclusion:
-At the 5% significance level, we fail to reject the null that the likert variable: Membership to the trade union has a constant scale.
+At the 5% significance level, we fail to reject the null that the Likert variable: Membership to the trade union has a constant scale.
 
+\newpage
 
-### 3
+### FamSize
 
-We split the Family size into dummy variables, now we have two models; the first one has Political intrest, Membership in the Trade Union, Family size and are, the second one has those same variables but Family size is split into dummy variables. We then apply the Likelihood ratio test.
+We split the Family size into dummy variables, now we have two models; the first one has Political interest, Membership in the Trade Union, Family size and are, the second one has those same variables but Family size is split into dummy variables. We then apply the Likelihood ratio test.
 
 ```{r}
 
@@ -493,11 +511,9 @@ We split the Family size into dummy variables, now we have two models; the first
 m1 <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+as.factor(FamSize)+Area, data = dat_t, 
          family = binomial(link='logit'))
 
-summary(m1)
 
 
 lr = lrtest(m, m1)
-lr
 ```
 
 
@@ -511,19 +527,21 @@ lr
 $LR=-2\ln \left[{\frac {\sup _{\theta \in \Theta _{0}}{\mathcal {L}}(\theta )}{\sup _{\theta \in \Theta }{\mathcal {L}}(\theta )}}\right] \sim \mathcal {X}^2$
 - Decision rule and figure:
 We reject the null hypothesis if $LR>\mathcal {X}^2_{\alpha,7}$ or if $p-value<0.05$
-```{r}
+
+```{r fig.cap="Chisquare Distribution", out.width="60%", fig.align="center"}
 dist_chisq(p = 0.05, deg.f = 7)
 ```
 
 - Calculations and decision:
   p-value= `r lr[2,5] `>0.05. So we do not reject $H_0$.
 - Conclusion:
-At the 5% significance level, we fail to reject the null that the likert variable: Membership to the Family Size has a constant scale.
+At the 5% significance level, we fail to reject the null that the Likert variable: Membership to the Family Size has a constant scale.
 
+\newpage
 
-### 4
+### Area
 
-We split the Area dummy variables, now we have two models; the first one has Political intrest, Membership in the Trade Union, Family size and are, the second one has those same variables but Area is split into dummy variables. We then apply the Likelihood ratio test.
+We split the Area dummy variables, now we have two models; the first one has Political interest, Membership in the Trade Union, Family size and are, the second one has those same variables but Area is split into dummy variables. We then apply the Likelihood ratio test.
 
 ```{r}
 
@@ -531,11 +549,7 @@ We split the Area dummy variables, now we have two models; the first one has Pol
 m1 <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+as.factor(Area), data = dat_t, 
          family = binomial(link='logit'))
 
-summary(m1)
-
-
 lr = lrtest(m, m1)
-lr
 ```
 
 
@@ -549,18 +563,21 @@ lr
 $LR=-2\ln \left[{\frac {\sup _{\theta \in \Theta _{0}}{\mathcal {L}}(\theta )}{\sup _{\theta \in \Theta }{\mathcal {L}}(\theta )}}\right] \sim \mathcal {X}^2$
 - Decision rule and figure:
 We reject the null hypothesis if $LR>\mathcal {X}^2_{\alpha,1}$ or if $p-value<0.05$
-```{r}
+
+```{r fig.cap="Chisquare Distribution", out.width="60%", fig.align="center"}
 dist_chisq(p = 0.05, deg.f = 1)
 ```
 
 - Calculations and decision:
   p-value= `r lr[2,5] `<0.05. So we reject $H_0$.
 - Conclusion:
-At the 5% significance level, we reject the null that the likert variable: Area has a constant scale.
+At the 5% significance level, we reject the null that the Likert variable: Area has a constant scale.
 
-The recommended practice in this situation is to treat Political Intrest, Membership to the trade union and Family size as lickert variables, but attribute a different parameters to each dummy of the Area variable.
+The recommended practice in this situation is to treat Political Intrest, trade union membership, and Family size as Lickert variables, but to attribute different parameters to each dummy of the Area variable.
 
-## 5) Observed v. Predicted
+\newpage
+
+## Observed v. Predicted
 
 ```{r}
 preds <- predict.glm(m1, dat_t, type="response")
@@ -576,16 +593,19 @@ for(i in 1:length(preds))
 preds <- as.data.frame(preds)
 pred_obs <- cbind(dat_t$socialdemocrats, preds)
 pred_obs <- as.data.frame(pred_obs)
-
-
 cm =confusionMatrix(as.factor(pred_obs$preds), as.factor(pred_obs$`dat_t$socialdemocrats`), positive = NULL, dnn = c("Prediction", "Observed"))
-cm$table
+```
+
+```{r}
+rownames(cm$table) = c("Pred 0", "Pred 1")
+colnames(cm$table) = c("Obs. 0", "Obs. 1")
+kable(cm$table, caption = "Predicted and observed values", digits = 2)
 ```
 
 At the 0.5 cut-off, the model does not predict anyone to vote for the social democrates. The model always guesses correctly that a person would not vote for the social democrates if in reality they did not vote for them. The model always guesses incorrectly that a person would vote for the social democrates if in reality they did vote for them. So, the model decided that in every case the individual did not vote for the social democrates. We suspect that we got these results due to fitting the model to an unbalanced dataset; the dataset contains 1294 individuals who did not vote for the social democrates and only 472 who did vote for them. Thus, the choice of having a cut-off point at 0.5 may not be adequate. We try to come up with the best cut-off point by plotting the performance of the model for various cut-off points versus what true positive values it should give us. The cut-off point should be the intersection between those two.
 
 
-The goodness-of-fit measure taht we choose is the accuracy,. It is the ration of the correctly predicted observations to the total observations. Is calculated by:
+The goodness-of-fit measure that we choose is the accuracy,. It is the ration of the correctly predicted observations to the total observations. Is calculated by:
 Accuracy = $\frac{TP+TN}{TP+TN+FP+FN}$
 
 where: TP = True positive; FP = False positive; TN = True negative; FN = False negative.
@@ -593,7 +613,7 @@ where: TP = True positive; FP = False positive; TN = True negative; FN = False n
 So the accuracy for our model is `r cm$overall[1]`
 
 
-```{r}
+```{r fig.cap="Chisquare Distribution", out.width="60%", fig.align="center"}
 preds <- predict.glm(m1, dat_t, type="response")
 pred = prediction(preds, dat_t$socialdemocrats)
 plot(unlist(performance(pred, "sens")@x.values), unlist(performance(pred, "sens")@y.values), 
@@ -621,27 +641,38 @@ for(i in 1:length(preds))
 preds <- as.data.frame(preds)
 pred_obs <- cbind(dat_t$socialdemocrats, preds)
 pred_obs <- as.data.frame(pred_obs)
-
-
 cm =confusionMatrix(as.factor(pred_obs$preds), as.factor(pred_obs$`dat_t$socialdemocrats`), positive = NULL, dnn = c("Prediction", "Observed"))
-cm$table
+```
+
+```{r}
+rownames(cm$table) = c("Pred 0", "Pred 1")
+colnames(cm$table) = c("Obs. 0", " 1")
+kable(cm$table, caption = "Predicted and observed values", digits = 2)
 ```
 
 With this new cut-off point, 802 individuals who did not actually vote for the social democrats were actually predicted correctly, however the model got 492 individuals who did not actually vote for the social democrats wrong. The model now is able to predict correctly 278 of the individuals who voted for the social democrats, however it failed with 194 individuals from this category. Overall, the new model with cut-off point of 0.28 gives better results than the model with cut-off point =0.5.
 
 The accuracy for our model is `r cm$overall[1]`
 
-## 6) Probit model
+\newpage
+
+## Probit model
 
 
 ```{r}
 
 
-m <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+Area, data = dat_t, 
+m <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+as.factor(Area), data = dat_t, 
          family = binomial(link='probit'))
 
-summary(m)
+```
 
+```{r}
+table2 = data.frame(Coefficients = c("Intercept", "PoInt", "TradeUn", "FamSize", "Area"),
+                   Estimate = c(-0.33873, 0.10292, -0.30996 , -0.06322, 0.04038),
+                   Significant = c(NA, "Yes", "Yes", "Yes", "No"))
+
+kable(table2, caption = "Probit Model", digits = 2)
 ```
 
 After estimating our probit model, we obtain $\beta^0,...,\beta^4$ estimates of the parameters of the model. $\beta^0,...,\beta^3$ are significant and $\beta^4$ is not significant.
@@ -652,7 +683,7 @@ For every one unit increase in family size, the log odds of voting for the Socia
 The parameter for the variable Area is not significant so it does not contribute any explanatory power.
 
 
-```{r}
+```{r fig.cap="Chisquare Distribution", out.width="60%", fig.align="center"}
 preds <- predict.glm(m, dat_t, type="response")
 pred = prediction(preds, dat_t$socialdemocrats)
 plot(unlist(performance(pred, "sens")@x.values), unlist(performance(pred, "sens")@y.values), 
@@ -683,66 +714,43 @@ pred_obs <- as.data.frame(pred_obs)
 
 
 cm1 =confusionMatrix(as.factor(pred_obs$preds), as.factor(pred_obs$`dat_t$socialdemocrats`), positive = NULL, dnn = c("Prediction", "Observed"))
-cm1$table # Probit
-cm$table # logit
+```
+
+
+```{r}
+rownames(cm$table) = c("Pred 0", "Pred 1")
+colnames(cm$table) = c("Obs. 0", "Obs. 1")
+rownames(cm1$table) = c("Pred 0", "Pred 1")
+colnames(cm1$table) = c("Obs. 0", "Obs. 1")
+kable(cm$table, caption = "Predicted and observed values for Logit model", digits = 2)
+kable(cm1$table, caption = "Predicted and observed values for Probit model", digits = 2)
 ```
 
 With the probit model 818 individuals who did not actually vote for the social democrats were actually predicted correctly, however the model got 476 individuals who did not actually vote for the social democrats wrong. The model now is able to predict correctly 265 of the individuals who voted for the social democrats, however it failed with 107 individuals from this category. 
 
 
-The accuracy for our model is `r cm$overall[1]`.
+The accuracy for our model is `r cm1$overall[1]`.
 
 The probit model's predictions are better with individuals who voted for the social democrats and for those who did not compared to the logit model.
 The probit model has a slightely better accuracy than the logit model so we conclude that the probit model is better than the logit model.
 
+\newpage
 
 # Conclusion
 
+In this assignment, we have performed a study regarding voting habits, based on a dataset from the European Social Survey, from which we used a small number of variables. We focused on the Social Democratic Party of Sweden and this became our dependant variable - weather an individual in our sample had voted for this party or not. 
+
+For modeling, we used Logit and Probit models. We chose a couple of variables we thought would have an impact on voting for the Social Democrats, such as membership in a trade union, or measured political interest. Prediction is used to determine how much the chance of voting for Social Democrats changed when we change the values of a single individual, and found that in some cases this can impact quite a lot, such as one example: If the individual was living alone, then s/he would have a 4.67% lower chance to vote for the Social Democrats compared to if s/he would have a spouse. 
+
+A likelihood ratio test was also applied to our variables and only one of our variables was found to be non-constant - a variable that did not contribute any explanatory power to the logit model. We evaluated our logit model by measuring its accuracy, which was found to be 61.1%. Finally, we compared our logit model with a probit model using the same dataset. We found the accuracy of our probit model to be 61.3% - a difference of 0.02% percent, so rather small difference, but a difference nonetheless.
+
+\newpage
+
 # Appendix
 
+table = cbind(preds, dat_t$socialdemocrats)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# A more simple way to set up the model
-
-```{r}
-# For example: PaperTime
-
-dat_t$PaperTime = as.numeric(dat_t$PaperTime)
-
-m <- glm(as.factor(socialdemocrats) ~ as.factor(PaperTime), data = dat_t, 
-         family = binomial(link='logit'))
-summary(m)
-
-
-
-m <- glm(as.factor(socialdemocrats) ~ as.factor(PoInt)+as.factor(TradeUn)+as.factor(FamSize)+as.factor(Area), data = dat_t, 
-         family = binomial(link='logit'))
-
-summary(m)
-```
-
-# Interpretation Template
-
-For example, gre and gpa are continuous variables and rank is likert variable.
-
-> For every one unit change in gre, the log odds of admission (versus non-admission) increases by 0.002.
-
-> For a one unit increase in gpa, the log odds of being admitted to graduate school increases by 0.804.
-
-> The indicator variables for rank have a slightly different interpretation. For example, having attended an undergraduate institution with rank of 2, versus an institution with a rank of 1, changes the log odds of admission by -0.675.
-
+library(InformationValue)
+optCutOff <- optimalCutoff(dat_t$socialdemocrats, preds)[1]
 
