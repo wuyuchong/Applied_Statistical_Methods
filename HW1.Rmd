@@ -12,12 +12,12 @@ output:
 
 # REMINDER
 
-1. The result part is blank - fixed, removed result
-2. The name for the coefficient tables are wrong. 
-3. The coefficient table for PROBIT is wrong at the area category. - fixed
-4. Put the coefficient tables into the interpretation part of the presentation.
-5. Put the selected variables tables into the dataset part of the presentation.
-6. Change the layout of the presentation. We just need one vertical section for each person. Thus, there should be 3 columns except the first slide in total.
+1. The names of two cut-off plots are wrong: should not be Chisquare Distribution - fixed
+2. In the presentation part: The Likelihood Ratio-test part, constant should be constant scale - fixed
+3. In the PDF, the section 8.5 Observed v. Predicted should be renamed for the reason that it is too casual. - fixed
+4. Make a table for the likelyhood ratio test in the presentation. It should contain 3 columns: p_value, reject or not, constant scale or not. And contains 4 rows for 4 variables. - fixed
+5. In the presentation, in the Comparison between observed and expected part, please add the table of confusion matrix from the report. - fixed
+
 
 ***
 
@@ -82,6 +82,23 @@ The probit model is similar to the logit model, but uses the CDF form the normal
 
 $$P(X=1|X_1,X_2,...,X_k)=F(\beta_0+\beta_1X_1+...+\beta_kX_k) $$
 Where, $F(*)$ is the CDF from the normal distribution.
+
+
+In order to evaluate the models, we draw a confusion matrix, which is putting the predictions of the model wersus their true value.
+
+```{r}
+table = data.frame(Obs_Pred = c("Pred 0","Pred 1"), 
+                   Obs_0 = c("True Negative(TN)","False Positive(FP)"),
+                   Obs_1 = c("False Negative(FN)","True Negative(TN)"))
+
+# Then for PDF:
+kable(table, caption = "Confusion Matrix", digits = 2)
+```
+
+The goodness of fit measure that we chose is the accuracy: it is the measure of all the correctly predicted values. The formula to calculate it is:
+
+$$\frac{TP + TN}{TP + TN + FP + FN}$$
+
 
 \newpage
 
@@ -577,7 +594,7 @@ The recommended practice in this situation is to treat Political Intrest, trade 
 
 \newpage
 
-## Observed v. Predicted
+## Comparison between observed values and expected values
 
 ```{r}
 preds <- predict.glm(m1, dat_t, type="response")
@@ -613,7 +630,7 @@ where: TP = True positive; FP = False positive; TN = True negative; FN = False n
 So the accuracy for our model is `r cm$overall[1]`
 
 
-```{r fig.cap="Chisquare Distribution", out.width="60%", fig.align="center"}
+```{r fig.cap="Plot for Cutoff Point", out.width="60%", fig.align="center"}
 preds <- predict.glm(m1, dat_t, type="response")
 pred = prediction(preds, dat_t$socialdemocrats)
 plot(unlist(performance(pred, "sens")@x.values), unlist(performance(pred, "sens")@y.values), 
@@ -683,7 +700,7 @@ For every one unit increase in family size, the log odds of voting for the Socia
 The parameter for the variable Area is not significant so it does not contribute any explanatory power.
 
 
-```{r fig.cap="Chisquare Distribution", out.width="60%", fig.align="center"}
+```{r fig.cap="Plot for Cutoff Point", out.width="60%", fig.align="center"}
 preds <- predict.glm(m, dat_t, type="response")
 pred = prediction(preds, dat_t$socialdemocrats)
 plot(unlist(performance(pred, "sens")@x.values), unlist(performance(pred, "sens")@y.values), 

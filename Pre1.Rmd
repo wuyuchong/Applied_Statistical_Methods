@@ -204,12 +204,32 @@ dat_t$Area[dat_t$Area == "Don't know"] = 88
 
 # Introduction
 
----
+## What is task about?
 
-What is task about?
+Swedish Election 2006
 
 
-# Theory - logit/probit
+Who votes for Social Democrats?
+
+
+What variables are important?
+
+
+What model should we use?
+
+
+## Theory - logit/probit {style="text-align: left"}
+
+Logit:
+
+A Logit model is a regression model where the dependent variable is a categorical, binary (zero or one) variable.
+
+
+Probit:
+
+The probit model is similar to the logit model, but uses the CDF form the normal distribution instead of the logistic distribution.
+
+## Formulas {style="text-align: left"}
 
 $$P(X=1|X_1,X_2,...,X_k)=F(\beta_0+\beta_1X_1+...+\beta_kX_k) $$
 
@@ -221,12 +241,58 @@ $\beta_0,\beta_1,..,\beta_k$ are the parameters of the model to be estimated.
 
 $X_1,X_2,...,X_k$ are the variables and the dependant variable $X$ is "social democrats" in our dataset.
 
-# Our dataset
+## Accuracy
+
+The larger the value of accuracy, the better the model?
+
+---
+
+```{r}
+table = data.frame(observed = c(0,0,0,0,1,0,0,0,0,1),
+                   predicted = c(0,0,0,0,0,0,0,0,0,0))
+kable(table, caption = "No model performed")
+```
 
 
-## Election result
+$$Accuracy = \frac{right}{right + wrong} = \frac{8}{8 + 2} = 0.8$$
 
-Voting data, Election 2006
+---
+
+```{r}
+table = data.frame(observed = c(0,0,0,0,1,0,0,0,0,1),
+                   predicted = c(0,0,0,1,1,1,0,0,0,0))
+kable(table, caption = "Perform a model")
+```
+
+$$Accuracy = \frac{right}{right + wrong} = \frac{7}{7 + 3} = 0.7$$
+
+---
+
+```{r}
+table = data.frame(observed = c(0,0,0,0,1,0,0,0,0,1),
+                   guessing = c(0,0,0,0,0,0,0,0,0,0),
+                   predicted = c(0,0,0,1,1,1,0,0,0,0))
+kable(table, caption = "Comparison between two models")
+```
+
+guessing: 80%
+
+Perform a model: 70%
+
+# variables and expected values
+
+## Our dataset
+
+European Social Survey, which is a biannual multicountry survey. 
+
+Measures attitudes, beliefs and behaviours across the European Union. 
+
+Survey from 2006 and contains a total of 487 variables from 1927 respondents.
+
+We use a total of 24 variables from this dataset.
+
+
+## Voting data, Election 2006
 
 ```{r}
 dat %>% 
@@ -242,31 +308,132 @@ dat %>%
   ylab("Percentage") +
   guides(fill = "none") +
   coord_flip() +
-  theme(panel.background = element_blank())
+  theme_bw()
 ```
 
-# Logit Model
 
-What variables have we used?
+## variables and expected values
 
-## Interpretations
+```{r}
+
+table = data.frame(VarName = c("TradeUn", "PoInt", "FamSize", "Area"),
+                   Measure = c("Trade Union membership", "Political interest", "Size of family", "Urbanisation"),
+                   ExpEffect = c("Neg.", "Neg.", "Pos.", "Pos."))
+
+kable(table, caption = "Chosen variables", digits = 2)
+
+```
+
+
+## Logit Model
+
+This is our Logit model:
+
+```{r}
+
+dat_t$PoInt <- as.numeric(dat_t$PoInt)
+dat_t$TradeUn <- as.numeric(dat_t$TradeUn)
+dat_t$FamSize <- as.numeric(dat_t$FamSize)
+dat_t$Area <- as.numeric(dat_t$Area)
+
+m <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+Area, data = dat_t, 
+         family = binomial(link='logit'))
+
+```
+
+```{r}
+table2 = data.frame(Coefficients = c("Intercept", "PoInt", "TradeUn", "FamSize", "Area"),
+                   Estimate = c(-0.50969, 0.17109, -0.53338 , -0.10878, 0.06648),
+                   Significant = c(NA, "Yes", "Yes", "Yes", "No"))
+
+kable(table2, caption = "Logit Model", digits = 2)
+```
+
+
+## Interpretations of result
+
+- For every one unit increase in the PoInt, increases by `r m$coefficients[2]`, holding other variables constant.
+- For every one unit increase in being a member of the Trade Union,  decreases by `r m$coefficients[3]`, holding other variables constant.
+- For every one unit increase in family size, decreases by `r m$coefficients[4]`, holding other variables constant.
+- The parameter for the variable Area is not significant so it does not contribute any explanatory power.
 
 ## Predictions
 
-We play around with values!
+Individual #18 from our data is our test subject.
+
+```{r}
+table3 = data.frame(Nr = c(1, 2, 3, 4, 5),PoInt = c(0.03394278, 0, -0.03646351, -0.0751499 , NA),
+                   TradeUn = c(0, 0.09676355, 0.1668725, NA, NA),
+                   FamSize = c(-0.04676795, -0.0229091 , 0, 0.02188785, 0.04270068 ))
+
+kable(table3, caption = "Changes in individual #18", digits = 2)
+```
+
 
 # Likelihood Ratio-test
 
-TEST
+Break up variables into dummies and perform tests
+
+
+PoInt is constant
+
+
+TradeUn is constant
+
+
+FamSize is constant
+
+
+Area is not constant
+
+
 
 ## Comparison between observed and expected
 
-How are they different?
+Logit accuracy = 61.1%
 
-# Probit Model
 
-## Comparison between observed and expected
+## Probit Model
 
-How are they different?
+```{r}
 
-# Conclusion
+
+m <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+Area, data = dat_t, 
+         family = binomial(link='probit'))
+
+```
+
+
+```{r}
+table2 = data.frame(Coefficients = c("Intercept", "PoInt", "TradeUn", "FamSize", "Area"),
+                   Estimate = c(-0.33873, 0.10292, -0.30996 , -0.06322, 0.04038),
+                   Significant = c(NA, "Yes", "Yes", "Yes", "No"))
+
+kable(table2, caption = "Probit Model", digits = 2)
+```
+
+## Best model?
+
+Logit accuracy = 61.1%
+
+
+Probit accuract = 61.3%
+
+
+A small difference of 0.02%
+
+## Conclusion
+
+PoInt significant and constant
+
+
+TradeUn significant and constant
+
+
+FamSize significant and constant
+
+
+Area not stignificant and not constant
+
+
+Probit > Logit in terms of accuracy
