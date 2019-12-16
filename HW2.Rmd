@@ -47,49 +47,17 @@ library(lavaan)
 ```
 
 ```{r}
-load("HolzingerSwineford1939.RData")
-dat = as.data.frame(df)
+load("Anxeitydata.RData")
+dat = as.data.frame(X)
 dat
 dat_t = dat 
-dat_t$school = as.numeric(dat_t$school)
 ```
-
-
-
-
-### Model 3
-
 
 
 
 ```{r}
-model <- '
-   # latent variables
-     geo_abi =~ x1 + x2 + x3
-     lan_abi =~ x4 + x5 + x6 
-     alg_abi =~ x7 + x8 + x9
-   # regressions
-     geo_abi ~ ageyr + grade + sex
-     lan_abi ~ ageyr + grade + sex
-     alg_abi ~ ageyr + grade + sex
-   # residual covariances
-'
-
-
-fit = cfa(model, data=dat_t,group = "school")
-
-
-
-
-#summary(fit, fit.measures = TRUE)
-#devAskNewPage(ask = FALSE)
-#semPaths(fit)
-
-Eval4 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
-
+data.frame(latent = c("A", NA, NA, "B", NA, NA, "C", NA, NA),
+           measurement = c("A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3")) %>% 
+   kable(caption = "Latent variables and Measurements")
 ```
-
-### Models evaluation
-
-
 
