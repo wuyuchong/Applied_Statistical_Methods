@@ -208,15 +208,35 @@ dat_t$Area[dat_t$Area == "Don't know"] = 88
 
 Swedish Election 2006
 
-
 Who votes for Social Democrats?
-
 
 What variables are important?
 
-
 What model should we use?
 
+## Theory - Binary
+
+## Linear
+
+```{r fig.cap="Linear Regression Model", out.width="50%", fig.align="center"}
+table = data.frame(x = 1:10,
+                   y = c(0,0,0,0,1,0,1,1,1,1))
+table %>% 
+   ggplot(aes(x = x, y = y)) +
+   geom_point(color = "red") +
+   theme_bw() +
+   geom_abline(aes(intercept=-0.3, slope=0.15), color = "blue")
+```
+
+## logit
+
+```{r fig.cap="Logit Model", out.width="50%", fig.align="center"}
+table %>% 
+   ggplot(aes(x = x, y = y)) +
+   geom_point(color = "red") +
+   theme_bw() +
+   geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE) 
+```
 
 ## Theory - logit/probit {style="text-align: left"}
 
@@ -228,6 +248,7 @@ A Logit model is a regression model where the dependent variable is a categorica
 Probit:
 
 The probit model is similar to the logit model, but uses the CDF form the normal distribution instead of the logistic distribution.
+
 
 ## Formulas {style="text-align: left"}
 
@@ -344,18 +365,12 @@ m <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+Area, data = dat_t,
 ```{r}
 table2 = data.frame(Coefficients = c("Intercept", "PoInt", "TradeUn", "FamSize", "Area"),
                    Estimate = c(-0.50969, 0.17109, -0.53338 , -0.10878, 0.06648),
-                   Significant = c(NA, "Yes", "Yes", "Yes", "No"))
+                   Significant = c(NA, "Yes", "Yes", "Yes", "No"),
+                   ExpValue = c(NA, "Neg.", "Neg.", "Pos.", "Pos."))
 
 kable(table2, caption = "Logit Model", digits = 2)
 ```
 
-
-## Interpretations of result
-
-- For every one unit increase in the PoInt, increases by `r m$coefficients[2]`, holding other variables constant.
-- For every one unit increase in being a member of the Trade Union,  decreases by `r m$coefficients[3]`, holding other variables constant.
-- For every one unit increase in family size, decreases by `r m$coefficients[4]`, holding other variables constant.
-- The parameter for the variable Area is not significant so it does not contribute any explanatory power.
 
 ## Predictions
 
