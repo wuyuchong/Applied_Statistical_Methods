@@ -26,7 +26,9 @@ output:
 
 # Abstract {-}
 
-In this study, we tried to figure out what variables impact the choice of voting for the Social Democratic Party of Sweden as well as their effects. The study is based on a dataset from the European Social Survey from 2006. We selected 4 Likert variables. Then we established Logit and Probit models and found that most of our variables were significant and constant scale, except for one. After comparing the accuracy values in two models, we conclude that the probit model is better than the logit model, but the difference is very small.
+In this study, we tried to figure out what variables impact the choice of voting for the Social Democratic Party of Sweden as well as their effects. The study is based on a dataset from the European Social Survey from 2006. We selected 4 Likert variables. Then we established Logit and Probit models and found that most of our variables were significant and constant scale, except for one. 
+
+The accuracy of our logit model was 61.1%, while the accuracy of our probit model was slightly higher, at 61.3%. Thus, we conclude that the probit model is better than the logit model, but the difference is very small.
 
 
 \newpage
@@ -705,10 +707,11 @@ kable(table2, caption = "Probit Model", digits = 2)
 
 After estimating our probit model, we obtain $\beta^0,...,\beta^4$ estimates of the parameters of the model. $\beta^0,...,\beta^3$ are significant and $\beta^4$ is not significant.
 
-For every one unit increase in the Political Intrest, the log odds of voting for the Social democrates increases by `r m$coefficients[2]`, holding other variables constant.
-For every one unit increase in being a member of the Trade Union, the log odds of voting for the Social democrates decreases by `r m$coefficients[3]`, holding other variables constant.
-For every one unit increase in family size, the log odds of voting for the Social democrates decreases by `r m$coefficients[4]`, holding other variables constant.
-The parameter for the variable Area is not significant so it does not contribute any explanatory power.
+
+- For the person who is one level less interested in politics, the log odds of voting for the Social democrates increases by `r m$coefficients[2]`, holding other variables constant.
+- For the person who is a member of the Trade Union compared to the one who was a member or the person who was a member of the Trade Union compared to the person who was not a member, the log odds of voting for the Social democrates decreases by `r m$coefficients[3]`, holding other variables constant.
+- For every one additional member increase in family size, the log odds of voting for the Social democrates decreases by `r m$coefficients[4]`, holding other variables constant.
+- The parameter for the variable Area is not significant so it does not contribute any significant explanatory power.
 
 
 ```{r fig.cap="Plot for Cutoff Point", out.width="60%", fig.align="center"}
@@ -770,7 +773,7 @@ In this assignment, we have performed a study regarding voting habits, based on 
 
 For modeling, we used Logit and Probit models. We chose a couple of variables we thought would have an impact on voting for the Social Democrats, such as membership in a trade union, or measured political interest. Prediction is used to determine how much the chance of voting for Social Democrats changed when we change the values of a single individual, and found that in some cases this can impact quite a lot, such as one example: If the individual was living alone, then s/he would have a 4.67% lower chance to vote for the Social Democrats compared to if s/he would have a spouse. 
 
-A likelihood ratio test was also applied to our variables and only one of our variables was found to be non-constant - a variable that did not contribute any explanatory power to the logit model. We evaluated our logit model by measuring its accuracy, which was found to be 61.1%. Finally, we compared our logit model with a probit model using the same dataset. We found the accuracy of our probit model to be 61.3% - a difference of 0.02% percent, so rather small difference, but a difference nonetheless.
+A likelihood ratio test was also applied to our variables and only one of our variables has a non-constant scale. We evaluated our logit model by measuring its accuracy, which was found to be 61.1%. Finally, we compared our logit model with a probit model using the same dataset. We found the accuracy of our probit model to be 61.3% - a difference of 0.02% percent, so rather small difference, but a difference nonetheless.
 
 \newpage
 

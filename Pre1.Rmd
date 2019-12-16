@@ -1,6 +1,9 @@
 ---
 title: "Presentation for HW1 - Vote"
-author: 'Claes Kock, Yuchong Wu, Mayara Latrech'
+author:
+  - Claes Kock
+  - Mayara Latrech
+  - Yuchong Wu
 date: '18/12/2019'
 output:
   revealjs::revealjs_presentation:
@@ -439,16 +442,16 @@ A small difference of 0.02%
 
 ## Conclusion
 
-PoInt significant and constant
+PoInt is significant and constant scale
 
 
-TradeUn significant and constant
+TradeUn is significant and constant scale
 
 
-FamSize significant and constant
+FamSize is significant and constant scale
 
 
-Area not stignificant and not constant
+Area is not stignificant and not constant scale
 
 
 Probit > Logit in terms of accuracy
