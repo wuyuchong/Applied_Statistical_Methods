@@ -49,15 +49,9 @@ library(lavaan)
 ```{r}
 load("Anxeitydata.RData")
 dat = as.data.frame(X)
-dat
-dat_t = dat 
 ```
 
 
 
-```{r}
-data.frame(latent = c("A", NA, NA, "B", NA, NA, "C", NA, NA),
-           measurement = c("A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3")) %>% 
-   kable(caption = "Latent variables and Measurements")
-```
 
+sagfgfdag

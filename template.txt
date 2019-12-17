@@ -1,0 +1,12 @@
+---
+geometry: margin=3cm
+header-includes:
+   - \usepackage{array}
+   - \usepackage{float}
+   - \usepackage{graphicx}
+logo: "Uppsala_University_seal_svg.png"
+output: 
+  pdf_document:
+    template: template.tex
+    number_sections: yes
+---
