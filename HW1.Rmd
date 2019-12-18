@@ -108,8 +108,6 @@ Our data is from the European Social Survey, which is a biannual multicountry su
 
 Thus we use a total of 24 variables from this dataset, plus some dummy variables.
 
-
-
 ```{r}
 dat_vote <- read.csv("vote_parties.csv", na.strings = "No answer")
 dat <- read.csv("vote_parties.csv", na.strings = c("No answer", "Don't know"))
@@ -137,6 +135,9 @@ names(dat)[names(dat) == "f5"] <- "Area"
 names(dat)[names(dat) == "f27"] <- "FormUnemp"
 names(dat)[names(dat) == "f30"] <- "TradeUn"
 names(dat)[names(dat) == "f32"] <- "IncLvl"
+data.frame(Variables = 1:31,
+           Names = names(dat)) %>% 
+  kable(caption = "All the variables in the dataset")
 ```
 
 ```{r}
@@ -361,6 +362,7 @@ table2 = data.frame(Coefficients = c("Intercept", "PoInt", "TradeUn", "FamSize",
 kable(table2, caption = "Logit Model", digits = 2)
 ```
 
+\newpage
 
 ## Intepretation of parameters
 

@@ -1,0 +1,31 @@
+---
+title: "Reminder1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Good afternoon everyone.
+
+We all know that there are many political parties in Sweden. Have you ever thought about which kind of people will be more likely to vote for social democrats? We will give you the answer. However, before that, we would like to introduce our model first.
+
+For the dependent variable, there are just two categories, which means that it is a binary variable.
+
+So, what will happen if we fit it using a linear regression model? It's clear that this model doesn't work well for the reason that some predicted values will go out of range and in the meantime, some are not accurate especially for the middle ones.
+
+Thus, instead, we use the logit model, which is suitable for binary outcomes.
+
+First, we use another concept to express the probability, which is the odds. Then we take the log-odds and it becomes linear.
+
+Also, instead of the logit model, we also use a probit model, which is quite similar but have the assumption that the variance is $pai$ square over three.
+
+After we estimate the model, then we need to verify the model. But, is that the larger the value of accuracy, the better the model?
+
+There is a simple example. Instead of performing a model, we just guess that every values are all 0.
+
+Then, we perform a model. And we captured some 1s, but in the meantime, we made some mistake.
+
+Although the accuracy drops down, it doesn't mean that our model doesn't make sense. Thus, just try to capture the binary outcome and don't only focus on accuracy.
+

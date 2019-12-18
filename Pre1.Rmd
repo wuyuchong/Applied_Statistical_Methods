@@ -219,7 +219,17 @@ What model should we use?
 
 ## Theory - Binary
 
+Dependant Variable:
+
+- Vote for democrats
+
+- Vote for other parties
+
 ## Linear
+
+```{r eval=FALSE, echo=TRUE}
+lm(y ~ x)
+```
 
 ```{r fig.cap="Linear Regression Model", out.width="50%", fig.align="center"}
 table = data.frame(x = 1:10,
@@ -233,6 +243,10 @@ table %>%
 
 ## logit
 
+```{r eval=FALSE, echo=TRUE}
+glm(y ~ x, family = binomial(link='logit'))
+```
+
 ```{r fig.cap="Logit Model", out.width="50%", fig.align="center"}
 table %>% 
    ggplot(aes(x = x, y = y)) +
@@ -240,6 +254,17 @@ table %>%
    theme_bw() +
    geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE) 
 ```
+
+## Formulas {style="text-align: left"}
+
+$$P(X=1|X_1,X_2,...,X_k)=F(\beta_0+\beta_1X_1+...+\beta_kX_k) $$
+
+$$F(x)=\frac{1}{1+e^{-x}}$$
+Transform into linear:
+
+$$Odds = \frac{\operatorname{Pr}(y=1 | \mathbf{x})}{1-\operatorname{Pr}(y=1 | \mathbf{x})}$$
+
+$$\ln \left[Odds\right]=\mathbf{x} \boldsymbol{\beta}$$
 
 ## Theory - logit/probit {style="text-align: left"}
 
@@ -252,18 +277,6 @@ Probit:
 
 The probit model is similar to the logit model, but uses the CDF form the normal distribution instead of the logistic distribution.
 
-
-## Formulas {style="text-align: left"}
-
-$$P(X=1|X_1,X_2,...,X_k)=F(\beta_0+\beta_1X_1+...+\beta_kX_k) $$
-
-Where,
-
-$$F(x)=\frac{1}{1+e^{-x}}$$
-
-$\beta_0,\beta_1,..,\beta_k$ are the parameters of the model to be estimated.
-
-$X_1,X_2,...,X_k$ are the variables and the dependant variable $X$ is "social democrats" in our dataset.
 
 ## Accuracy
 
@@ -414,11 +427,8 @@ Logit accuracy = 61.1%
 ## Probit Model
 
 ```{r}
-
-
 m <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+Area, data = dat_t, 
          family = binomial(link='probit'))
-
 ```
 
 
