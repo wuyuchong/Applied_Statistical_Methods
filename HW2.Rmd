@@ -224,6 +224,7 @@ Overall the data does not really support the model. In fact, our measurements ar
 ## Three factor models
 
 ### Model 1
+
 We now try having three 3 different categories: physical symptoms, Intrusive thoughts and worrying. Where  being Jittery and having a fast Heartbeat are measurements of physical symptoms. Thinking about getting through school, Thoughts interfere with concentration and Think about failing are measurements of Intrusive thoughts. Being Uneasy and Worrying before an exam are measurements of worrying.
 
 ```{r include=FALSE}

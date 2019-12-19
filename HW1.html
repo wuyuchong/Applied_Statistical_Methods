@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Claes Kock, Yuchong Wu, Mayara Latrech" />
+  <title>Presentation for HW1 - Vote</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="HW1_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+
+<link rel="stylesheet" href="HW1_files/reveal.js-3.3.0.1/css/theme/sky.css" id="theme">
+
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+    <link href="HW1_files/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+    <link href="HW1_files/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Presentation for HW1 - Vote</h1>
+    <h2 class="author">Claes Kock, Yuchong Wu, Mayara Latrech</h2>
+    <h3 class="date">18/12/2019</h3>
+</section>
+
+<section><section id="introduction" class="title-slide slide level1"><h1>Introduction</h1></section><section id="what-is-task-about" class="slide level2">
+<h2>What is task about?</h2>
+<p>Swedish Election 2006</p>
+<p>Who votes for Social Democrats?</p>
+<p>What variables are important?</p>
+<p>What model should we use?</p>
+</section><section id="theory---binary" class="slide level2">
+<h2>Theory - Binary</h2>
+</section><section id="linear" class="slide level2">
+<h2>Linear</h2>
+<div class="figure" style="text-align: center">
+<img src="HW1_files/figure-revealjs/unnamed-chunk-1-1.png" alt="Linear Regression Model" width="50%" />
+<p class="caption">
+Linear Regression Model
+</p>
+</div>
+</section><section id="logit" class="slide level2">
+<h2>logit</h2>
+<div class="figure" style="text-align: center">
+<img src="HW1_files/figure-revealjs/unnamed-chunk-2-1.png" alt="Logit Model" width="50%" />
+<p class="caption">
+Logit Model
+</p>
+</div>
+</section><section id="theory---logitprobit" class="slide level2" style="text-align: left">
+<h2>Theory - logit/probit</h2>
+<p>Logit:</p>
+<p>A Logit model is a regression model where the dependent variable is a categorical, binary (zero or one) variable.</p>
+<p>Probit:</p>
+<p>The probit model is similar to the logit model, but uses the CDF form the normal distribution instead of the logistic distribution.</p>
+</section><section id="formulas" class="slide level2" style="text-align: left">
+<h2>Formulas</h2>
+<p><span class="math display">\[P(X=1|X_1,X_2,...,X_k)=F(\beta_0+\beta_1X_1+...+\beta_kX_k) \]</span></p>
+<p>Where,</p>
+<p><span class="math display">\[F(x)=\frac{1}{1+e^{-x}}\]</span></p>
+<p><span class="math inline">\(\beta_0,\beta_1,..,\beta_k\)</span> are the parameters of the model to be estimated.</p>
+<p><span class="math inline">\(X_1,X_2,...,X_k\)</span> are the variables and the dependant variable <span class="math inline">\(X\)</span> is “social democrats” in our dataset.</p>
+</section><section id="accuracy" class="slide level2">
+<h2>Accuracy</h2>
+<p>The larger the value of accuracy, the better the model?</p>
+</section><section class="slide level2">
+
+<table>
+<caption>No model performed</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">observed</th>
+<th style="text-align: right;">predicted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[Accuracy = \frac{right}{right + wrong} = \frac{8}{8 + 2} = 0.8\]</span></p>
+</section><section class="slide level2">
+
+<table>
+<caption>Perform a model</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">observed</th>
+<th style="text-align: right;">predicted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[Accuracy = \frac{right}{right + wrong} = \frac{7}{7 + 3} = 0.7\]</span></p>
+</section><section class="slide level2">
+
+<table>
+<caption>Comparison between two models</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">observed</th>
+<th style="text-align: right;">guessing</th>
+<th style="text-align: right;">predicted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p>guessing: 80%</p>
+<p>Perform a model: 70%</p>
+</section></section>
+<section><section id="variables-and-expected-values" class="title-slide slide level1"><h1>variables and expected values</h1></section><section id="our-dataset" class="slide level2">
+<h2>Our dataset</h2>
+<p>European Social Survey, which is a biannual multicountry survey.</p>
+<p>Measures attitudes, beliefs and behaviours across the European Union.</p>
+<p>Survey from 2006 and contains a total of 487 variables from 1927 respondents.</p>
+<p>We use a total of 24 variables from this dataset.</p>
+</section><section id="voting-data-election-2006" class="slide level2">
+<h2>Voting data, Election 2006</h2>
+<p><img src="HW1_files/figure-revealjs/unnamed-chunk-6-1.png" width="768" /></p>
+</section><section id="variables-and-expected-values-1" class="slide level2">
+<h2>variables and expected values</h2>
+<table>
+<caption>Chosen variables</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">VarName</th>
+<th style="text-align: left;">Measure</th>
+<th style="text-align: left;">ExpEffect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">TradeUn</td>
+<td style="text-align: left;">Trade Union membership</td>
+<td style="text-align: left;">Neg.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PoInt</td>
+<td style="text-align: left;">Political interest</td>
+<td style="text-align: left;">Neg.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FamSize</td>
+<td style="text-align: left;">Size of family</td>
+<td style="text-align: left;">Pos.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Area</td>
+<td style="text-align: left;">Urbanisation</td>
+<td style="text-align: left;">Pos.</td>
+</tr>
+</tbody>
+</table>
+</section><section id="logit-model" class="slide level2">
+<h2>Logit Model</h2>
+<p>This is our Logit model:</p>
+<table>
+<caption>Logit Model</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Coefficients</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: left;">Significant</th>
+<th style="text-align: left;">ExpValue</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: right;">-0.51</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PoInt</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Neg.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TradeUn</td>
+<td style="text-align: right;">-0.53</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Neg.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FamSize</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Pos.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Area</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Pos.</td>
+</tr>
+</tbody>
+</table>
+</section><section id="predictions" class="slide level2">
+<h2>Predictions</h2>
+<p>Individual #18 from our data is our test subject.</p>
+<table>
+<caption>Changes in individual #18</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Nr</th>
+<th style="text-align: right;">PoInt</th>
+<th style="text-align: right;">TradeUn</th>
+<th style="text-align: right;">FamSize</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">-0.05</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">-0.02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-0.08</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0.04</td>
+</tr>
+</tbody>
+</table>
+</section></section>
+<section><section id="likelihood-ratio-test" class="title-slide slide level1"><h1>Likelihood Ratio-test</h1></section><section id="comparison-between-observed-and-expected" class="slide level2">
+<h2>Comparison between observed and expected</h2>
+<p>Logit accuracy = 61.1%</p>
+</section><section id="probit-model" class="slide level2">
+<h2>Probit Model</h2>
+<table>
+<caption>Probit Model</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Coefficients</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: left;">Significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: right;">-0.34</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PoInt</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TradeUn</td>
+<td style="text-align: right;">-0.31</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FamSize</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Area</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: left;">No</td>
+</tr>
+</tbody>
+</table>
+</section><section id="best-model" class="slide level2">
+<h2>Best model?</h2>
+<p>Logit accuracy = 61.1%</p>
+<p>Probit accuract = 61.3%</p>
+<p>A small difference of 0.02%</p>
+</section><section id="conclusion" class="slide level2">
+<h2>Conclusion</h2>
+<p>PoInt significant and constant</p>
+<p>TradeUn significant and constant</p>
+<p>FamSize significant and constant</p>
+<p>Area not stignificant and not constant</p>
+<p>Probit &gt; Logit in terms of accuracy</p>
+</section></section>
+    </div>
+  </div>
+
+  <script src="HW1_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="HW1_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: false,
+        // Transition style
+        transition: 'convex', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        menu: {
+          custom: false,
+          themes: false,
+          transitions: false
+        },
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'HW1_files/reveal.js-3.3.0.1/plugin/zoom-js/zoom.js', async: true },
+          { src: 'HW1_files/reveal.js-3.3.0.1/plugin/menu/menu.js', async: true },
+        ]
+      });
+    </script>
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>

@@ -34,7 +34,7 @@ library(semPlot)
 library(lavaan)
 library(gmodels)
 
-load("Anxeity_data.RData")
+load("Anxeitydata.RData")
 dat = as.data.frame(X)
 
 ```
@@ -113,7 +113,7 @@ We expect our factors to be positively correlated with each other.
 
 We expect that all our variables have a positive effect on their respective latent variables.
 
-## one factor model
+## one-factor model
 
 ```{r include=FALSE}
 dat = X
@@ -135,7 +135,8 @@ r2_1 = inspect(fit, 'r2')
 ```
 
 ```{r}
-png(file = "factor.png", width = 1024, height = 1024)
+png(file = "factor.png", width = 1024, height = 768)
+par(bg = rgb(240,241,235,255, maxColorValue = 255))
 semPaths(fit,whatLabels="par", intercepts=FALSE, 
          nCharNodes=0, residuals =TRUE,
          nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
@@ -147,7 +148,7 @@ dev.off()
 include_graphics("factor.png")
 ```
 
-## Three factor model -  model 1
+## Three-factor model -  model 1
 
 ```{r include=FALSE}
 model <- '
@@ -169,7 +170,8 @@ r2_2 = inspect(fit, 'r2')
 ```
 
 ```{r}
-png(file = "1.png", width = 1024, height = 1024)
+png(file = "1.png", width = 1024, height = 768)
+par(bg = rgb(240,241,235,255, maxColorValue = 255))
 semPaths(fit,whatLabels="par", intercepts=FALSE, 
          nCharNodes=0, residuals =TRUE,
          nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
@@ -181,7 +183,7 @@ dev.off()
 include_graphics("1.png")
 ```
 
-## Three factor model -  model 2
+## Three-factor model -  model 2
 
 ```{r include=FALSE}
 model <- '
@@ -190,8 +192,7 @@ model <- '
      thoughts =~ Think_get_through + Thoughts_interfere + Think_failing
      worry =~ Uneasy + Worry_before
    # regressions
-     phy_symp ~ worry
-     thoughts ~ worry
+     phy_symp ~ worry + thoughts
    # residual covariances
 '
 
@@ -206,7 +207,8 @@ r2_5 = inspect(fit, 'r2')
 ```
 
 ```{r}
-png(file = "2.png", width = 1024, height = 1024)
+png(file = "2.png", width = 1024, height = 512)
+par(bg = rgb(240,241,235,255, maxColorValue = 255))
 semPaths(fit,whatLabels="par", intercepts=FALSE, 
          nCharNodes=0, residuals =TRUE,
          nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
@@ -215,7 +217,7 @@ dev.off()
 ```
 
 
-## Three factor model -  model 3
+## Three-factor model -  model 3
 
 ```{r include=FALSE}
 model <- '
@@ -238,7 +240,16 @@ r2_4 = inspect(fit, 'r2')
 ```
 
 ```{r}
-png(file = "3.png", width = 1024, height = 1024)
+png(file = "final.png", width = 1024, height = 768)
+par(bg = rgb(240,241,235,255, maxColorValue = 255))
+semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         nCharNodes=0, residuals =TRUE,
+         nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         layout="tree2",curvePivot=TRUE)
+dev.off()
+
+png(file = "3.png", width = 1024, height = 512)
+par(bg = rgb(240,241,235,255, maxColorValue = 255))
 semPaths(fit,whatLabels="par", intercepts=FALSE, 
          nCharNodes=0, residuals =TRUE,
          nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
@@ -247,7 +258,7 @@ dev.off()
 ```
 
 
-## Three factor model -  model 4
+## Three-factor model -  model 4
 
 ```{r include=FALSE}
 model <- '
@@ -270,7 +281,8 @@ r2_5 = inspect(fit, 'r2')
 ```
 
 ```{r}
-png(file = "4.png", width = 1024, height = 1024)
+png(file = "4.png", width = 1024, height = 512)
+par(bg = rgb(240,241,235,255, maxColorValue = 255))
 semPaths(fit,whatLabels="par", intercepts=FALSE, 
          nCharNodes=0, residuals =TRUE,
          nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
@@ -311,7 +323,9 @@ Eval5
 ```{r}
 allmodels = data.frame(Eval1, Eval2, Eval3, Eval4, Eval5)
 
-colnames(allmodels) = c("One-factor models","Model1", "Model2", "Model3", "Model4")
+allmodels = t(allmodels)
+
+rownames(allmodels) = c("One-factor model","Model1", "Model2", "Model3", "Model4")
 
 write.csv(allmodels, file = "allmodels.csv")
 ```
@@ -319,15 +333,6 @@ write.csv(allmodels, file = "allmodels.csv")
 Since model 3 wins in 3 categories, we consider it to be our best model.
 
 ## final model
-
-```{r}
-png(file = "final.png", width = 1024, height = 1024)
-semPaths(fit,whatLabels="par", intercepts=FALSE, 
-         nCharNodes=0, residuals =TRUE,
-         nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
-         layout="tree2",curvePivot=TRUE)
-dev.off()
-```
 
 # Interpretation
 

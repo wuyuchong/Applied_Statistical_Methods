@@ -1,5 +1,5 @@
 ---
-title: "Presentation for HW1 - Vote"
+title: "Vote for Democrats"
 author:
   - Claes Kock
   - Mayara Latrech
@@ -21,11 +21,17 @@ output:
 ```{r setup, include=FALSE, message=FALSE}
 knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE)
 library(knitr)
+library(reshape2)
 library(ggplot2)
-library(tidyverse)
+library(moments)
 library(dummies)
+library(tidyverse)
 library(DT)
 library(lmtest)
+library(sjPlot)
+library(ROCR)
+library(POCRE)
+library(caret)
 
 dat_vote <- read.csv("vote_parties.csv", na.strings = "No answer")
 dat <- read.csv("vote_parties.csv", na.strings = c("No answer", "Don't know"))
@@ -403,32 +409,33 @@ kable(table3, caption = "Changes in individual #18", digits = 2)
 
 # Likelihood Ratio-test
 
+## Likelihood Ratio-test
+
 Break up variables into dummies and perform tests
 
 
-PoInt is constant
+```{r}
+table4 = data.frame(Variable= c("PoInt", "TradeUn", "FamSize", "Area"),
+                    p_value= c(0.2657473, 0.7211906, 0.35788, 0.0007565942),
+                   Reject = c("no", "no", "no" , "yes"),
+                   Constant_scale = c("Yes", "Yes", "Yes", "No"))
+
+kable(table4, caption = "LR-Tests", digits = 2)
+```
 
 
-TradeUn is constant
 
 
-FamSize is constant
-
-
-Area is not constant
-
-
-
-## Comparison between observed and expected
-
-Logit accuracy = 61.1%
 
 
 ## Probit Model
 
 ```{r}
+
+
 m <- glm(as.factor(socialdemocrats) ~ PoInt+TradeUn+FamSize+Area, data = dat_t, 
          family = binomial(link='probit'))
+
 ```
 
 
@@ -442,6 +449,64 @@ kable(table2, caption = "Probit Model", digits = 2)
 
 ## Best model?
 
+```{r}
+
+
+m1 <- glm(as.factor(socialdemocrats) ~ as.factor(PoInt)+TradeUn+FamSize+Area, data = dat_t, 
+         family = binomial(link='logit'))
+
+
+lr = lrtest(m, m1)
+```
+
+```{r}
+preds <- predict.glm(m1, dat_t, type="response")
+for(i in 1:length(preds))
+{
+  if (preds[i]<0.28)
+  {
+    preds[i]=0
+  }
+  else {preds[i]=1}
+}
+
+preds <- as.data.frame(preds)
+pred_obs <- cbind(dat_t$socialdemocrats, preds)
+pred_obs <- as.data.frame(pred_obs)
+
+
+cm =confusionMatrix(as.factor(pred_obs$preds), as.factor(pred_obs$`dat_t$socialdemocrats`), positive = NULL, dnn = c("Prediction", "Observed"))
+```
+
+
+```{r}
+preds <- predict.glm(m, dat_t, type="response")
+for(i in 1:length(preds))
+{
+  if (preds[i]<0.3)
+  {
+    preds[i]=0
+  }
+  else {preds[i]=1}
+}
+
+preds <- as.data.frame(preds)
+pred_obs <- cbind(dat_t$socialdemocrats, preds)
+pred_obs <- as.data.frame(pred_obs)
+
+
+cm1 =confusionMatrix(as.factor(pred_obs$preds), as.factor(pred_obs$`dat_t$socialdemocrats`), positive = NULL, dnn = c("Prediction", "Observed"))
+```
+
+```{r}
+rownames(cm$table) = c("Pred 0", "Pred 1")
+colnames(cm$table) = c("Obs. 0", "Obs. 1")
+rownames(cm1$table) = c("Pred 0", "Pred 1")
+colnames(cm1$table) = c("Obs. 0", "Obs. 1")
+kable(cm$table, caption = "Predicted and observed values for Logit model", digits = 2)
+kable(cm1$table, caption = "Predicted and observed values for Probit model", digits = 2)
+```
+
 Logit accuracy = 61.1%
 
 
@@ -452,16 +517,26 @@ A small difference of 0.02%
 
 ## Conclusion
 
-PoInt is significant and constant scale
-
-
-TradeUn is significant and constant scale
-
-
-FamSize is significant and constant scale
-
-
-Area is not stignificant and not constant scale
-
-
 Probit > Logit in terms of accuracy
+
+## Thanks for watching
+
+\  
+
+> Author:
+>
+> Claes Kock
+>
+> Mayara Latrech
+>
+> Yuchong Wu
+
+<small>
+
+This presentation can be found on:
+
+[www.yu-chong.com/projects/vote](https://www.yu-chong.com/projects/vote)
+
+and you are welcome to give us feedback
+
+</small>
