@@ -10,24 +10,10 @@ output:
     number_sections: yes
 ---
 
-# Caution: Never copy the whole thing into the latest version from your own workspace
-
-# Example for making table:
-
-```{r eval=FALSE}
-table = data.frame(column1 = c(1, 2, "text"), 
-                   column2 = c(4, 5, 6))
-
-# Then for PDF:
-kable(table, caption = "title here", digits = 2)
-
-# For presentation:
-datatable(table)
-```
-
 # Reminders:
 
 1. Titles for all the plots and tables
+2. Change Three factor model to Three-factor model
 
 ***
 
@@ -43,6 +29,9 @@ library(gmodels)
 load("Anxeitydata.RData")
 dat = as.data.frame(X)
 ```
+
+
+# Abstract
 
 \newpage
 
@@ -215,9 +204,14 @@ Holding all variables constant, a unit change in `r colnames(dat)[6]` would affe
 
 Holding all variables constant, a unit change in `r colnames(dat)[7]` would affect the Anxiety level by `r s$PE$est[7] `.
 
-We can calculate the R-squared value for each variable. We notice that the model captures `r r2_1`. 
+```{r}
 
-Overall the data does not really support the model. In fact, our measurements are more aligned with being in 3 different categories than just one category called Anxeity. We can see that being Jittery and having a fast Heartbeat can be categorized into physical symptoms.Thinking about getting through school, Thoughts interfere with concentration and Think about failing are Intrusive thoughts. Being Uneasy and Worrying before an exam can be categorized as worrying. Hence, we obtain three latent variables.
+allmodels1 = data.frame(Eval1)
+colnames(allmodels1) = c("One-factor models")
+kable(allmodels1, caption = "Evaluation of One-factor model", digits = 2)
+```
+
+We notice that the one-factor has elevated values for all our evaluation measures. Hence, the data does not really support the model. In fact, our measurements are more aligned with being in 3 different categories than just one category called Anxeity. We can see that being Jittery and having a fast Heartbeat can be categorized into physical symptoms.Thinking about getting through school, Thoughts interfere with concentration and Think about failing are Intrusive thoughts. Being Uneasy and Worrying before an exam can be categorized as worrying. Hence, we obtain three latent variables.
 
 
 
@@ -437,6 +431,7 @@ Holding Worrying before exam constant, a unit change in Uneasiness would affect 
 Holding Uneasiness constant, a unit change in Worrying before exam would affect the Physical symptoms by `r s$PE$est[6] `.
 
 For the regressions, worrying still significant for explaining physical symptoms but it is not significant for physical symptoms.
+
 \newpage
 
 ### Models evaluation
@@ -456,7 +451,7 @@ Eval5
 allmodels = data.frame(Eval1, Eval2, Eval3, Eval4, Eval5)
 
 colnames(allmodels) = c("One-factor models","Model1", "Model2", "Model3", "Model4")
-kable(allmodels, caption = "Evaluation of models", digits = 3)
+kable(allmodels, caption = "Evaluation of models", digits = 2)
 ```
 
 As we can see in the above table, model 3 has the smallest values in the categories AIC, BIC and RMSEA, the most out of any model. Thus we consider it to be our best model. For this model, physical symptoms and intrusive thoughts are not correlated. We expected all of the latent variables to be somewhat correlated, so this is not what we expected. However, both of these latent variables are correlated with worrying.
@@ -555,3 +550,4 @@ The purpose of this assignment has been to gain some experience using factor mod
 \newpage
 
 # Appendix
+
