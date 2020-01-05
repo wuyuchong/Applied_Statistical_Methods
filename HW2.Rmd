@@ -11,13 +11,6 @@ output:
     number_sections: yes
 ---
 
-# Reminders:
-
-1. Titles for all the plots and tables
-2. Change Three factor model to Three-factor model
-
-***
-
 ```{r setup, include=FALSE, message=FALSE}
 knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE, warning = FALSE)
 library(knitr)
@@ -31,8 +24,15 @@ load("Anxeitydata.RData")
 dat = as.data.frame(X)
 ```
 
+# Abstract {-}
 
-# Abstract
+Nowadays there might be a large proportion of students who have psychological burdens regarding examination in school. To verify this assumption, we use structural equation model to further research the psychological status before and during the exam.
+
+We tried to come up with some meaningful latent variables which can be measured by other variables and then make our assumptions. Using the dataset from Gierl and Rogers (1996) we built structural equation models with which we performed factor analysis.  
+
+To map student anxiety regarding exams, which was represented by our latent variables, consisting of *physical symptoms*,* intrusive thoughts*, and *worry*, we worked our way up from using only one latent variable and adding more latent variables once the first one was rejected, due to not fitting our data. The full models, i.e. the ones that used all three latent variables, were evaluated using five different measures of model fit. We chose the model that was the best in the most amount of categories. This model did not completely match our expectations, as not all of the latent variables were highly correlated. However, the latent variable *Worry* was highly correlated with the other two latent variables. All our observable variables had a positive effect on their respective latent variables, and all of them were significant.
+
+Thus, we conclude that an individual who is feeling worried and uneasy before an examination is more likely to be nervous during the examination.
 
 \newpage
 
@@ -42,7 +42,7 @@ dat = as.data.frame(X)
 
 # Introduction
  
-The purpose of this assignment is to perform a factor analysis. The assignment is divided into two parts: one theoretical, where we try to make a theoretical model of an equally theoretical latent variable. The second is more practical - we use an actual dataset. The purpose of the second part of the assignment is to get some hands-on experience performing factor analysis, including estimation, interpretation and model checking. It is here that we will build structural equation models with which we will perform factor analysis. Our dataset for this task is from Gierl and Rogers (1996). The latent variable we want to model is test anxiety. We model this by using the variables form the dataset and successively build a structural equation model.
+The purpose of this assignment is to perform a factor analysis. The assignment is divided into two parts: one theoretical, where we try to come up with some meaningful latent variables which can be measured by other variables and then make our assumptions. The second is more practical - we use an actual dataset. The purpose of the second part of the assignment is to get some hands-on experience performing factor analysis, including estimation, interpretation and model checking. It is here that we will build structural equation models with which we will perform factor analysis. Our dataset for this task is from Gierl and Rogers (1996). The latent variable we want to model is test anxiety. We model this by using the variables form the dataset and successively build a structural equation model.
  
 \newpage
 
@@ -55,10 +55,12 @@ As an example we have IQ-tests. Here, IQ is the unknown factor that we want to m
 The structural equation models consist of two parts:
 
 Measurement part:
+
 - Factor model for the endogenous variables
 - Factor model for the exogenous variables
 
 Structural part:
+
 - Model implied by theory
 
 ## Measurement part
@@ -99,6 +101,8 @@ The variables of the dataset measure test-related anxiety of Canadian high schoo
 However, we only use 7 variables and we do not use any gender variable.
 
 For this study we only look at male students, disregarding the female students.
+
+\newpage
 
 # Task 1
 
@@ -209,7 +213,7 @@ kable(allmodels1, caption = "Evaluation of One-factor model", digits = 4)
 
 We notice that the one-factor has elevated values for all our evaluation measures. Hence, the data does not really support the model. In fact, our measurements are more aligned with being in 3 different categories than just one category called *anxeity*. We can see that being Jittery and having a fast Heartbeat can be categorized into physical symptoms. Thinking about getting through school, Thoughts interfere with concentration and Think about failing are Intrusive thoughts. Being Uneasy and Worrying before an exam can be categorized as worrying. Hence, we obtain three latent variables.
 
-## Three factor models
+## three-factor models
 
 ### Model 1
 
@@ -440,9 +444,9 @@ Eval5
 ```
 
 ```{r}
-allmodels = data.frame(Eval1, Eval2, Eval3, Eval4, Eval5)
-colnames(allmodels) = c("One-factor models","Model1", "Model2", "Model3", "Model4")
-kable(allmodels, caption = "Evaluation of models", digits = 5)
+allmodels = read.csv("allmodels.csv")
+names(allmodels) = c("Model", "AIC", "BIC", "CFI", "RMSEA", "SRMR")
+kable(allmodels, caption = "Evaluation of models", digits = c(0,0,0,2,2,3))
 ```
 
 As we can see in the above table, model 3 has the smallest values in the categories AIC, BIC and RMSEA, the most out of any model. Thus we consider it to be our best model. For this model, physical symptoms and intrusive thoughts are not correlated. We expected all of the latent variables to be somewhat correlated, so this is not what we expected. However, both of these latent variables are correlated with worrying.
@@ -541,7 +545,7 @@ Overall, we can say that all observed variables are equally strong indicators of
 
 # Conclusion
 
-The purpose of this assignment has been to gain some experience using factor modeling. Our dataset formed the basis for our latent variables which, in turn, formed our models. Our goal was to map student anxiety regarding exams. This was represented by our latent variables, consisting of physical symptoms, intrusive thoughts and worry. When creating the models, we worked our way up from using only one latent variable and adding more latent variables once the first one was rejected, due to not fitting our data. The full models, i.e. the ones that used all three latent variables, were evaluated using five different measures of model fit. We chose the model that was the best in the most amount of categories. This model did not completely match our expectations, as not all of the latent variables were highly correlated. However, the latent variable Worry was highly correlated with the other two latent variables. All our observable variables had a positive effect on their respective latent variables, and all of them were significant.
+The purpose of this assignment is to gain some experience using factor modeling. Our dataset formed the basis for our latent variables which, in turn, formed our models. Our goal was to map student anxiety regarding exams. This was represented by our latent variables, consisting of physical symptoms, intrusive thoughts and worry. When creating the models, we worked our way up from using only one latent variable and adding more latent variables once the first one was rejected, due to not fitting our data. The full models, i.e. the ones that used all three latent variables, were evaluated using five different measures of model fit. We chose the model that was the best in the most amount of categories. This model did not completely match our expectations, as not all of the latent variables were highly correlated. However, the latent variable Worry was highly correlated with the other two latent variables. All our observable variables had a positive effect on their respective latent variables, and all of them were significant.
 
 \newpage
 
@@ -570,3 +574,10 @@ include_graphics("4.png")
 ```{r}
 summary(fit)
 ```
+
+## Code for the whole article
+
+```{r eval=FALSE, echo=TRUE, tidy=TRUE}
+#purl("HW2.Rmd", output = "code2.R")
+```
+
