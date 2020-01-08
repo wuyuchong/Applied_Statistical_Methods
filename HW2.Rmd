@@ -30,7 +30,7 @@ Nowadays there might be a large proportion of students who have psychological bu
 
 We tried to come up with some meaningful latent variables which can be measured by other variables and then make our assumptions. Using the dataset from Gierl and Rogers (1996) we built structural equation models with which we performed factor analysis.  
 
-To map student anxiety regarding exams, which was represented by our latent variables, consisting of *physical symptoms*,* intrusive thoughts*, and *worry*, we worked our way up from using only one latent variable and adding more latent variables once the first one was rejected, due to not fitting our data. The full models, i.e. the ones that used all three latent variables, were evaluated using five different measures of model fit. We chose the model that was the best in the most amount of categories. This model did not completely match our expectations, as not all of the latent variables were highly correlated. However, the latent variable *Worry* was highly correlated with the other two latent variables. All our observable variables had a positive effect on their respective latent variables, and all of them were significant.
+To map student anxiety regarding exams, which was represented by our latent variables, consisting of *physical symptoms*, *intrusive thoughts*, and *worry*, we worked our way up from using only one latent variable and adding more latent variables once the first one was rejected, due to not fitting our data. The full models, i.e. the ones that used all three latent variables, were evaluated using five different measures of model fit. We chose the model that was the best in the most amount of categories. This model did not completely match our expectations, as not all of the latent variables were highly correlated. However, the latent variable *Worry* was highly correlated with the other two latent variables. All our observable variables had a positive effect on their respective latent variables, and all of them were significant.
 
 Thus, we conclude that an individual who is feeling worried and uneasy before an examination is more likely to be nervous during the examination.
 
@@ -101,6 +101,13 @@ The variables of the dataset measure test-related anxiety of Canadian high schoo
 However, we only use 7 variables and we do not use any gender variable.
 
 For this study we only look at male students, disregarding the female students.
+
+```{r}
+table = dat
+colnames(table) = c("jittery", "heart rate", "think get through", "think interfere", "think failing", "Worry before", "Uneasy")
+table[1:8,] %>% 
+  kable(digits = 2, caption = "Head 8 out of 335 observations")
+```
 
 \newpage
 
@@ -207,8 +214,9 @@ r2_1 = inspect(fit, 'r2')
 ```{r}
 
 allmodels1 = data.frame(Eval1)
-colnames(allmodels1) = c("One-factor models")
-kable(allmodels1, caption = "Evaluation of One-factor model", digits = 4)
+allmodels1 = t(allmodels1)
+rownames(allmodels1) = c("One-factor models")
+kable(allmodels1, caption = "Evaluation of One-factor model", digits = 2)
 ```
 
 We notice that the one-factor has elevated values for all our evaluation measures. Hence, the data does not really support the model. In fact, our measurements are more aligned with being in 3 different categories than just one category called *anxeity*. We can see that being Jittery and having a fast Heartbeat can be categorized into physical symptoms. Thinking about getting through school, Thoughts interfere with concentration and Think about failing are Intrusive thoughts. Being Uneasy and Worrying before an exam can be categorized as worrying. Hence, we obtain three latent variables.
@@ -244,6 +252,10 @@ s = summary(fit)
 
 Eval2 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
 r2_2 = inspect(fit, 'r2')
+```
+
+```{r fig.align="center", fig.cap="Model 1", out.width="70%"}
+include_graphics("1.png")
 ```
 
 *The measures for the latent variable Physical symptoms are all significant.*
@@ -295,6 +307,10 @@ s = summary(fit)
 
 Eval3 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
 r2_3 = inspect(fit, 'r2')
+```
+
+```{r fig.align="center", fig.cap="Model 2", out.width="70%"}
+include_graphics("2.png")
 ```
 
 *The measures for the latent variable Physical symptoms are all significant.*
@@ -352,6 +368,10 @@ Eval4 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
 r2_4 = inspect(fit, 'r2')
 ```
 
+```{r fig.align="center", fig.cap="Model 3", out.width="70%"}
+include_graphics("3.png")
+```
+
 *The measures for the latent variable Physical symptoms are all significant.*
 
 - Holding fast heartbeat constant, a unit change in Jitteriness would affect the Physical symptoms by `r s$PE$est[1] `.
@@ -405,6 +425,10 @@ s = summary(fit)
 
 Eval5 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
 r2_5 = inspect(fit, 'r2')
+```
+
+```{r fig.align="center", fig.cap="Model 4", out.width="70%"}
+include_graphics("4.png")
 ```
 
 *The measures for the latent variable Physical symptoms are all significant.*
@@ -551,24 +575,6 @@ The purpose of this assignment is to gain some experience using factor modeling.
 
 # Appendix
 
-## Plots for Model 1 - Model 4
-
-```{r fig.align="center", fig.cap="Model 1", out.width="70%"}
-include_graphics("1.png")
-```
-
-```{r fig.align="center", fig.cap="Model 2", out.width="70%"}
-include_graphics("2.png")
-```
-
-```{r fig.align="center", fig.cap="Model 3", out.width="70%"}
-include_graphics("3.png")
-```
-
-```{r fig.align="center", fig.cap="Model 4", out.width="70%"}
-include_graphics("4.png")
-```
-
 ## Detail of the best model
 
 ```{r}
@@ -578,6 +584,261 @@ summary(fit)
 ## Code for the whole article
 
 ```{r eval=FALSE, echo=TRUE, tidy=TRUE}
-#purl("HW2.Rmd", output = "code2.R")
+## ----setup, include=FALSE, message=FALSE-----------------------------------------------------------------
+knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE, warning = FALSE)
+library(knitr)
+library(ggplot2)
+library(tidyverse)
+library(semPlot)
+library(lavaan)
+library(gmodels)
+
+load("Anxeitydata.RData")
+dat = as.data.frame(X)
+
+
+## --------------------------------------------------------------------------------------------------------
+table = dat
+colnames(table) = c("jittery", "heart rate", "think get through", "think interfere", "think failing", "Worry before", "Uneasy")
+table[1:8,] %>% 
+  kable(digits = 2, caption = "Head 8 out of 335 observations")
+
+
+## --------------------------------------------------------------------------------------------------------
+options(knitr.kable.NA = '')
+data.frame(latent = c("physical symptoms", NA, "intrusve thoughts", NA, NA, "worrying", NA),
+           measurement = c("jittery", "heart_rate", "think_get_through", "thoughts_interfere", "Think_failing", "Worry_before", "Uneasy")) %>% 
+   kable(caption = "Latent variables and Measurements")
+
+
+## --------------------------------------------------------------------------------------------------------
+options(knitr.kable.NA = '')
+data.frame(latent = c("physical symptoms", NA, "intrusve thoughts", NA, NA, "worrying", NA),
+           measurement = c("jittery", "heart_rate", "think_get_through", "thoughts_interfere", "Think_failing", "Worry_before", "Uneasy")) %>% 
+   kable(caption = "Latent variables and Measurements")
+
+
+## ----include=FALSE---------------------------------------------------------------------------------------
+model <- '
+   # latent variables
+     anxeity =~ Uneasy + Think_get_through + Thoughts_interfere + Jittery + Worry_before + Think_failing + Heartbeat_fast
+   # regressions
+
+   # residual covariances
+'
+
+fit = cfa(model, data=dat)
+
+s = summary(fit)
+#s$PE
+#semPaths(fit)
+#semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+         #edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+#semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         #nCharNodes=0, residuals =TRUE,
+         #nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         #layout="tree2",curvePivot=TRUE)
+
+Eval1 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
+r2_1 = inspect(fit, 'r2')
+
+
+## --------------------------------------------------------------------------------------------------------
+
+allmodels1 = data.frame(Eval1)
+allmodels1 = t(allmodels1)
+rownames(allmodels1) = c("One-factor models")
+kable(allmodels1, caption = "Evaluation of One-factor model", digits = 2)
+
+
+## ----include=FALSE---------------------------------------------------------------------------------------
+model <- '
+   # latent variables
+     phy_symp =~ Jittery + Heartbeat_fast
+     thoughts =~ Think_get_through + Thoughts_interfere + Think_failing
+     worry =~ Uneasy + Worry_before
+   # regressions
+
+   # residual covariances
+'
+
+fit = cfa(model, data=dat)
+
+s = summary(fit)
+#s$PE
+#semPaths(fit)jians
+#semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+         #edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+#semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         #nCharNodes=0, residuals =TRUE,
+         #nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         #layout="tree2",curvePivot=TRUE)
+
+Eval2 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
+r2_2 = inspect(fit, 'r2')
+
+
+## ----fig.align="center", fig.cap="Model 1", out.width="70%"----------------------------------------------
+include_graphics("1.png")
+
+
+## ----include=FALSE---------------------------------------------------------------------------------------
+model <- '
+   # latent variables
+     phy_symp =~ Jittery + Heartbeat_fast
+     thoughts =~ Think_get_through + Thoughts_interfere + Think_failing
+     worry =~ Uneasy + Worry_before
+   # regressions
+     phy_symp ~ worry + thoughts
+   # residual covariances
+'
+
+fit = cfa(model, data=dat)
+
+s = summary(fit)
+#s$PE
+#semPaths(fit)
+#semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+         #edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+#semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         #nCharNodes=0, residuals =TRUE,
+         #nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         #layout="tree2",curvePivot=TRUE)
+
+Eval3 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
+r2_3 = inspect(fit, 'r2')
+
+
+## ----fig.align="center", fig.cap="Model 2", out.width="70%"----------------------------------------------
+include_graphics("2.png")
+
+
+## ----include=FALSE---------------------------------------------------------------------------------------
+model <- '
+   # latent variables
+     phy_symp =~ Jittery + Heartbeat_fast
+     thoughts =~ Think_get_through + Thoughts_interfere + Think_failing
+     worry =~ Uneasy + Worry_before
+   # regressions
+     phy_symp ~ worry
+   # residual covariances
+'
+
+fit = cfa(model, data=dat)
+
+s = summary(fit)
+#s$PE
+#semPaths(fit)
+#semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+         #edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+#semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         #nCharNodes=0, residuals =TRUE,
+         #nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         #layout="tree2",curvePivot=TRUE)
+
+Eval4 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
+r2_4 = inspect(fit, 'r2')
+
+
+## ----fig.align="center", fig.cap="Model 3", out.width="70%"----------------------------------------------
+include_graphics("3.png")
+
+
+## ----include=FALSE---------------------------------------------------------------------------------------
+model <- '
+   # latent variables
+     phy_symp =~ Jittery + Heartbeat_fast
+     thoughts =~ Think_get_through + Thoughts_interfere + Think_failing
+     worry =~ Uneasy + Worry_before
+   # regressions
+     phy_symp ~ worry
+     thoughts ~ worry
+   # residual covariances
+'
+
+fit = cfa(model, data=dat)
+
+s = summary(fit)
+#s$PE
+#semPaths(fit)
+#semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+         #edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+#semPaths(fit,whatLabels="par", intercepts=FALSE, 
+         #nCharNodes=0, residuals =TRUE,
+         #nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+         #layout="tree2",curvePivot=TRUE)
+
+Eval5 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
+r2_5 = inspect(fit, 'r2')
+
+
+## ----fig.align="center", fig.cap="Model 4", out.width="70%"----------------------------------------------
+include_graphics("4.png")
+
+
+## ----include=FALSE---------------------------------------------------------------------------------------
+Eval1
+Eval2
+Eval3
+Eval4
+Eval5
+
+
+## --------------------------------------------------------------------------------------------------------
+allmodels = read.csv("allmodels.csv")
+names(allmodels) = c("Model", "AIC", "BIC", "CFI", "RMSEA", "SRMR")
+kable(allmodels, caption = "Evaluation of models", digits = c(0,0,0,2,2,3))
+
+
+## ----eval=FALSE------------------------------------------------------------------------------------------
+## model <- '
+##    # latent variables
+##      phy_symp =~ Jittery + Heartbeat_fast
+##      thoughts =~ Think_get_through + Thoughts_interfere + Think_failing
+##      worry =~ Uneasy + Worry_before
+##    # regressions
+##      phy_symp ~ worry
+##    # residual covariances
+## '
+## 
+## fit = cfa(model, data=dat)
+## 
+## #s = summary(fit)
+## #s$PE
+## #semPaths(fit)
+## #semPaths(fit, what='std', nCharNodes=6, sizeMan=10,
+##          #edge.label.cex=1.25, curvePivot = TRUE, fade=FALSE)
+## pdf(file = "sem.pdf")
+## semPaths(fit, what = "paths", whatLabels="par", intercepts=FALSE,
+##          nCharNodes=0, residuals =TRUE,
+##          nCharEdges=0, curveAdjacent = TRUE,title=TRUE,
+##          layout="tree2",curvePivot=TRUE)
+## dev.off()
+## 
+## #Eval4 = fitMeasures(fit, c("aic","bic" ,"cfi","rmsea","srmr"))
+## #r2_4 = inspect(fit, 'r2')
+
+
+## ----fig.align="center", fig.cap="Fitted model", out.width="90%"-----------------------------------------
+include_graphics("sem.png")
+
+
+## --------------------------------------------------------------------------------------------------------
+
+lf= inspect(fit,what="std")$lambda
+
+lf2 = as.data.frame(lf)
+
+kable(lf2, caption = "Factor Loadings", digits = 2)
+
+
+## --------------------------------------------------------------------------------------------------------
+summary(fit)
+
+
+## ----eval=FALSE, echo=TRUE, tidy=TRUE--------------------------------------------------------------------
+## #purl("HW2.Rmd", output = "code2.R")
+
+
 ```
 
