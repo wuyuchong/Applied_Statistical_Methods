@@ -1,0 +1,269 @@
+---
+geometry: margin=3cm
+header-includes:
+   - \usepackage{array}
+   - \usepackage{float}
+   - \usepackage{graphicx}
+logo: "Uppsala_University_seal_svg.png"
+output: 
+  pdf_document:
+    template: template.tex
+    number_sections: yes
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE, warning = FALSE)
+library(knitr)
+library(ggplot2)
+library(tidyverse)
+library(caret)
+library(fastDummies)
+dat = read.csv("b4 - hwa - wage - data.csv")
+```
+
+# Abstract {-}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+# Introduction
+
+From a theoretical perspective, this assignment intends to examine the wage gap between men and women in the Swedish economy. By "wage gap" we mean the difference in average salary between men and women. 
+
+This is done through the use of linear models. Thus "gender" will be an important variable, but we will also apply adjusted models, where we have applied additional variables which might influence the wage a person recieves. These include nationality of parents, if the family spoke swedish or not, where the person grew up and the general level of education, both for the person in question. but also their parents.
+
+\newpage
+
+# Data
+
+```{r}
+names(dat) = c("birth_year", "gender", "citizenship", "language", "lived_with", "father_schooling", "father_occupation", "mother_schooling", "mother_occupation", "live", "county", "education", "marital", "experience", "category", "wage")
+```
+
+
+Our data comes from the project HUS(Households economic living conditions). HUS is a database about households use of time, money and public services. HUS also contains background variables, e.g. education, working experience and salaries. 
+
+The survey is representative for native Swedish speaking families living in Sweden when the survey was conducted. The dataset contains 16 variables. Out of these 16 variables, we have renamed 14 variables in order to better reflect what they describe.
+
+\newpage
+
+# Preliminary Analysis
+
+In the dataset, we have several values which show a null value (due to information being unavailable), and thus we need to clean the data.
+
+```{r}
+dat[is.na(dat)] = 0
+means = c()
+variances = c()
+mins = c()
+maxs = c()
+for(i in 1:length(colnames(dat))){
+   means[i] = mean(dat[[colnames(dat)[i]]])
+   variances[i] = var(dat[[colnames(dat)[i]]])
+   mins[i] = min(dat[[colnames(dat)[i]]])
+   maxs[i] = max(dat[[colnames(dat)[i]]])
+}
+
+stats = data.frame(colnames(dat), means, variances, mins, maxs)
+kable(stats, caption = "Preliminary Analysis for the variables", digits = 2)
+```
+
+As we can see from the above table, the average individual was born in 1943, making the average age 48 years.
+^[The dataset was released in 1991] The average hourly wage is approximatly 46.5 kr, which is more than it looks, due to the value not being adjusted for inflation.
+
+The average years worked for an individual is around 20 years, and the amount of schooling is around 10 years. We can also see that while the education of the parents seems to be of a similar level (on average), the value for the type of occupation is not. ^[The outliers might be affecting these values.]
+
+\newpage
+
+# Regression
+
+## Mincer's earnings equation
+
+For the regression model we look at education and experience, which is the amount of years spent in education and the amount of years spent working respectively.
+
+$$ln(wage) = \beta_{0} + \beta_{1}education + \beta_{2}experience + \beta_{3}experience^2 + u$$
+
+We apply this regression to our dataset and get the following coefficients.
+
+```{r}
+dat = dat %>% 
+   mutate(log_wage = log(wage)) %>% 
+   mutate(experience_sq = experience^2)
+m1 = lm(log(wage) ~ education + experience + experience_sq, data = dat)
+sum = summary(m1)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the regression model", digits = 2)
+```
+
+The estimate of the model is:
+
+$$ln(wage) =  2.97  + 0.04 \ education + 0.03 \ experience  -0.0003 \ experience^2 + u$$
+
+To figure out whether the residuals in the wage model we estimated seem to be heteroscedastic or not, we plot the residuals.
+
+```{r out.width="70%", fig.align="center", fig.cap="Residuals Plot for the regression model"}
+data.frame(index = 1:length(m1$residuals), residuals = m1$residuals) %>% 
+   ggplot(aes(x = index, y = residuals)) +
+   geom_point(color = "red", alpha = 0.5) +
+   theme_bw()
+```
+
+As can be seen in the plot, there might be heteroskedaticity in our model, which is not clear enough. To further verify heteroskedaticity, we perform a Brausch-Pagan test.
+
+```{r}
+bptest = lmtest::bptest(m1)
+table = data.frame(BP = bptest$statistic, df = bptest$parameter, p_value = bptest$p.value)
+rownames(table) = "bptest"
+kable(table, caption = "Brausch-Pagan test", digits = 2)
+```
+
+Since the p-value of the test is lower than 0.05, we **reject** the null hypnothesis that we do not have a heteroskedacticity in our model, which we of course don't want to have. 
+
+## Box-Cox transformation
+
+Having heteroskedacticy weakens OLS (not best anymore) and we also risk getting incorrect standard errors. In order to rectify this problem we perform a **Box-Cox transformation** on our dependant variable. This means that we transform the non-normal dependant variable into a normal dependant variable.
+
+```{r out.width="50%", fig.align="center", fig.cap="QQ-plot for the model before Box-Cox transformation"}
+qqnorm(m1$residuals)
+qqline(m1$residuals, col = "red")
+```
+
+Here we can see the spread of the residuals of the model before the Box-Cox transformation.
+
+```{r}
+BClog_wage <- BoxCoxTrans(dat$log_wage)
+dat <- cbind(dat, log_wage_BC = predict(BClog_wage, dat$log_wage))
+m2 <- lm(dat$log_wage_BC ~ dat$education + dat$experience + dat$experience_sq)
+```
+
+We transform our dependant variable into a normal variable and add it to our dataset. Following this, we construct a new model where the dependent variable is the transformed dependant variable. After doing this we perform a Brausch-Pagan test to see if we still have a problem with heteroscedasticity.
+
+```{r}
+bptest = lmtest::bptest(m2)
+table = data.frame(BP = bptest$statistic, df = bptest$parameter, p_value = bptest$p.value)
+rownames(table) = "bptest"
+kable(table, caption = "Brausch-Pagan test for the model after Box-Cox transformation", digits = 2)
+```
+
+From the result of our test, we can observe a p-value of 0.2618, which is smaller than 0.05. We thus **can not reject** the null hypothesis that we have homoscedasticity. Thus our problem is solved.
+
+```{r out.width="50%", fig.align="center", fig.cap="QQ-plot for the model after Box-Cox transformation"}
+qqnorm(m2$residuals)
+qqline(m2$residuals, col = "red")
+```
+
+This QQ-plot shows the distribution of the residuals of our new model. We can see that the spread is much smaller compared to the first model, showing that the spread of the residuals has decreased.
+
+```{r}
+sum = summary(m2)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the model after Box-Cox transformation", digits = 2)
+```
+
+Our new estimated model after applying the BoxCox-test:
+
+$$ln(wage) = 1.39   +    0.02 \ education   +    0.01 \ experience      -0.0001 \ experience^2$$
+
+By applying the BoxCox-test, we force the dependant variable to be normal, which in turn affects the behavior of the residuals, making them even more spread.
+
+\newpage
+
+# Difference in Wages between men and women
+
+## Difference in means
+
+First we compare the difference in means between male and female workers:
+
+```{r out.width="70%", fig.align="center", fig.cap="Difference in Wages between men and women"}
+p_gender = dat
+for(i in 1:nrow(p_gender))
+{
+   if(p_gender$gender[i] == 1)
+   {
+      p_gender$gender[i] = "Male"
+   }
+   if(p_gender$gender[i] == 2)
+   {
+      p_gender$gender[i] = "Female"
+   }
+   if(p_gender$wage[i] > 200)
+   {
+      p_gender$wage[i] = 0
+   }
+}
+p_gender %>% 
+   ggplot(aes(x = gender, fill = gender, y = wage)) +
+   geom_boxplot()
+```
+
+```{r}
+m = aggregate(wage ~ gender, dat, mean)
+m$gender = c("Male", "Female")
+kable(m, caption = "Comparasion in mean of wages between male and female workers", digits = 2)
+difference = m$wage[1]-m$wage[2]
+```
+
+The average difference is approximately 9.97 kr/hour.
+
+## Independent T-test
+
+In this case, we have two unrelated ^[independent and unpaired] groups of samples. Therefore, we use an independent t-test to evaluate whether the means are different.
+
+## Test using regression model
+
+Then we formulate a regression model which allow us to test if there is a difference in wage.
+
+In this model, wage is dependant on the dummy variable "Male", which is 1 if the individual is male and 0 otherwise. Our model for examining the wage difference between genders is:
+
+$$Wage = \beta_{0} + \beta_{1} \ gender + u$$
+
+```{r}
+dat <- fastDummies::dummy_cols(dat, select_columns = "gender")
+m3 <- lm(dat$wage ~ dat$gender_1)
+sum = summary(m3)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the model including dummy variable", digits = 2)
+```
+
+From our results, we can see that the parameter of gender is non-zero and also **significant**, since the p-value is lower than 0.05. Thus there is a difference in wage when the individual is male, compared to when the individual is a female. However, do note that the R-squared is very low, so only a small part of the total wage is explained by gender.
+
+```{r}
+table = data.frame(Method = c("Difference of Means","Regression"),
+                   Result = c("9.97", "9.97"),
+                   Conclusion = c("significant", "significant"))
+
+
+# Then for PDF:
+kable(table, caption = "Wage difference", digits = 2)
+```
+
+From the above table, we can see that the result for both tests are the same. Both tests show that men earn 9.97kr more per hour, compared to women in our dataset. From these tests, we would conclude that there is gender discrimination.
+
+\newpage
+
+# Conclusion
+
+\newpage
+
+# Appendix
+
+## Regression Ourcome
+
+```{r}
+summary(m1)
+```
+
+## Regression Ourcome after Box-Cox transformation on our dependant variable
+
+```{r}
+summary(m2)
+```
+
+## Regression Ourcome for the model including dummy variable
+
+```{r}
+summary(m3)
+```
