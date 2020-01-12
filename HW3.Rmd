@@ -12,7 +12,7 @@ output:
 ---
 
 ```{r setup, include=FALSE, message=FALSE}
-knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE, warning = FALSE)
+knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE, warning = FALSE, comment = "")
 library(knitr)
 library(ggplot2)
 library(tidyverse)
@@ -178,23 +178,23 @@ By applying the BoxCox-test, we force the dependant variable to be normal, which
 First we compare the difference in means between male and female workers:
 
 ```{r out.width="70%", fig.align="center", fig.cap="Difference in Wages between men and women"}
-p_gender = dat
-for(i in 1:nrow(p_gender))
+dat_gender = dat
+for(i in 1:nrow(dat_gender))
 {
-   if(p_gender$gender[i] == 1)
+   if(dat_gender$gender[i] == 1)
    {
-      p_gender$gender[i] = "Male"
+      dat_gender$gender[i] = "Male"
    }
-   if(p_gender$gender[i] == 2)
+   if(dat_gender$gender[i] == 2)
    {
-      p_gender$gender[i] = "Female"
+      dat_gender$gender[i] = "Female"
    }
-   if(p_gender$wage[i] > 200)
+   if(dat_gender$wage[i] > 200)
    {
-      p_gender$wage[i] = 0
+      dat_gender$wage[i] = 0
    }
 }
-p_gender %>% 
+dat_gender %>% 
    ggplot(aes(x = gender, fill = gender, y = wage)) +
    geom_boxplot()
 ```
@@ -208,9 +208,48 @@ difference = m$wage[1]-m$wage[2]
 
 The average difference is approximately 9.97 kr/hour.
 
-## Independent T-test
+## Test of difference in means
 
-In this case, we have two unrelated ^[independent and unpaired] groups of samples. Therefore, we use an independent t-test to evaluate whether the means are different.
+In this case, we have two unrelated ^[independent and unpaired] groups of samples. Therefore, we use an **independent t-test** to evaluate whether the means are different.
+
+### Assumptions
+
+- two samples are independent
+
+Samples from men and women are not related.
+
+- The data from each of the 2 groups follow a normal distribution
+
+To verify this assumption, we use **Shapiro-Wilk Normality Test**.
+
+```{r}
+# Shapiro-Wilk normality test for Men's wage
+shapiro = with(dat_gender, shapiro.test(wage[gender == "Male"]))
+table = data.frame(method = shapiro$method, statistic = shapiro$statistic, p_value = shapiro$p.value)
+rownames(table) = "Male"
+kable(table, caption = "Shapiro-Wilk normality test for Men's wage", digits = 2)
+
+# Shapiro-Wilk normality test for Women's wage
+shapiro = with(dat_gender, shapiro.test(wage[gender == "Female"]))
+table = data.frame(method = shapiro$method, statistic = shapiro$statistic, p_value = shapiro$p.value)
+rownames(table) = "Female"
+kable(table, caption = "Shapiro-Wilk normality test for women's wage", digits = 2)
+```
+
+According to the outcome, we **reject** the null hypothesis that the data are normally distributed, and conclude that the data are not normally distributed.
+
+Thus we use **non parametric two-samples Wilcoxon rank test** instead of Shapiro-Wilk Normality Test.
+
+### Non parametric two-samples Wilcoxon rank test
+
+```{r}
+wilcox = wilcox.test(wage ~ gender, data = dat_gender, exact = FALSE)
+table = data.frame(method = wilcox$method, statistic = shapiro$statistic, p_value = shapiro$p.value)
+rownames(table) = NULL
+kable(table, caption = "Non parametric two-samples Wilcoxon rank test for women's wage", digits = 3)
+```
+
+According to the outcome, we **reject** the null hypothesis that the means of wages are equal between male and female, and conclude that there is gender discrimination.
 
 ## Test using regression model
 
@@ -222,7 +261,7 @@ $$Wage = \beta_{0} + \beta_{1} \ gender + u$$
 
 ```{r}
 dat <- fastDummies::dummy_cols(dat, select_columns = "gender")
-m3 <- lm(dat$wage ~ dat$gender_1)
+m3 <- lm(wage ~ gender_1, dat)
 sum = summary(m3)
 sum$coefficients %>% 
    kable(caption = "Regression Coefficients for the model including dummy variable", digits = 2)
@@ -233,14 +272,414 @@ From our results, we can see that the parameter of gender is non-zero and also *
 ```{r}
 table = data.frame(Method = c("Difference of Means","Regression"),
                    Result = c("9.97", "9.97"),
+                   Test = c("Non parametric two-samples Wilcoxon rank test", "T-test"),
                    Conclusion = c("significant", "significant"))
 
 
 # Then for PDF:
-kable(table, caption = "Wage difference", digits = 2)
+kable(table, caption = "Wage difference between male and female", digits = 2)
 ```
 
-From the above table, we can see that the result for both tests are the same. Both tests show that men earn 9.97kr more per hour, compared to women in our dataset. From these tests, we would conclude that there is gender discrimination.
+From the above table, we can see that the result for both tests are the same. Both tests show that it is **statistically significant** that on average men earn 9.97 kr more per hour, compared to women in our dataset. From these tests, we would conclude that there is gender discrimination.
+
+\newpage
+
+# Taking *education* and *experience* into account
+
+## Taking *education* into account
+
+We want to investigate if the difference in wages is caused by something other than just discrimination. For example, does education and experience play a role, and if so, is there a difference between men and women for these variables? To investigate this, we start by adding education as a variable to our model.
+
+```{r}
+m4 <- lm(wage ~ gender_1 + education, dat)
+sum = summary(m4)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the model containing education variable", digits = 2)
+```
+
+In our new model, we can see the effect of gender, as well as the effect of education. If we hold education constant, the effect of gender on wage is 8.94, meaning an increase of 8.94 kr per hour on average if the individual is male, when holding education constant. This is slightly different compared to the previous model, which had an increase of 9.97 kr per hour. We can also see that this model has a higher R-square value compared to our previous model. However, it is still fairly low. We can see that education is non-zero and significant, meaning that it has an effect on an individuals hourly wages. 
+
+We perform an F-test to see if education is the variable affecting the difference in the wage rather than gender.
+
+$$wage= \beta_0 + \beta_1 \ gender + \beta_2 \ education$$
+
+1. **Hypothesis:**
+
+$$H_0: \beta_1=0$$
+$$H_1: \beta_1 \neq 0$$
+
+2. **Significance level:**
+
+$$\alpha=0.05$$
+
+3. **Estimators:**
+
+$$\hat\beta_1, \ R^2_{UR}, \ R^2_{R}$$
+
+4. **Assumptions:**
+
+$$Large \ n$$
+
+5. **Test statistic:**
+$$F_{obs}=\frac{(R^2_{UR}- R^2_{R})/m}{(1-R^2_{UR})/(n-k)} \sim F_{m,n-k} $$
+
+where,
+
+- $R^2_{UR}$ is the coefficient of determination for the UnRestricted model
+- $R^2_{R}$  is the coefficient of determination for the Restricted model
+- m is the number of (linear) restrictions (in the null hypothesis)
+- n is the number of observations
+- k is the number of regression coefficients (parameters) in the regression line of theUnRestricted model (including the intercept)
+
+6. **Figure under the null and decision rule:**
+
+We reject the null if $F_{obs}>F_{m,n-k}$ or if p-value<0.05.
+
+```{r out.width="40%", fig.align="center", fig.cap="F distribution"}
+x = seq(0, 5, length = 100)
+distribution = df(x = x, df1 = 1, df2 = 1715)
+plot(x, distribution,type="l")
+```
+
+7. **Calculations and decision:**
+
+p-value = 2.2e-16 < 0.05 so we reject the null.
+
+8. **Conclusion:**
+
+Under the 5% significance level, we reject the null that gender is not relevant for hourly earnings. Hence, with this model we can see that there is gender discrimination.
+
+## Taking *education* and *experience* into account
+
+We continue by adding experience to the model.
+
+```{r}
+m5 <- lm(wage ~ gender_1 + education + experience, dat)
+summary(m5)
+```
+
+In this model we can see the effect of education and experience together. If we hold them both constant, the difference in hourly wage between men and women is 5.612 kr per hour, which is a fairly large decrease compared to the other models. The clear difference is still there, however. We have an increase in the value of R-square again, the model explains around 20% of the variation of hourly earnings. From our estimated model, we can see that one year of school increases the wage per hour by 2.39 kr, holding all other variables constant. Similarly, one year of working increases the wage per hour by 0.53 kr, holding all other variables constant.
+
+We perform an F-test to see if education and experience is the one affecting the difference in the wage rather than gender.
+
+$$wage= \beta_0 + \beta_1 \ gender + \beta_2 \ education + \beta_3 \ experience$$
+
+1. **Hypothesis:**
+
+$$H_0: \beta_1=0$$
+
+$$H_1: \beta_1 \neq 0$$
+
+2. **Significance level:**
+
+$$\alpha=0.05$$
+
+3. **Estimators:**
+
+$$\hat\beta_1, R^2_{UR}, R^2_{R}$$
+
+4. **Assumptions:**
+
+$$Large \ n$$
+
+5. **Test statistic:**
+
+$$F_{obs}=\frac{(R^2_{UR}- R^2_{R})/m}{(1-R^2_{UR})/(n-k)} \sim F_{m,n-k} $$
+
+where,
+- $R^2_{UR}$ is the coefficient of determination for the UnRestricted model
+- $R^2_{R}$  is the coefficient of determination for the Restricted model
+- m is the number of (linear) restrictions (in the null hypothesis)
+- n is the number of observations
+- k is the number of regression coefficients (parameters) in the regression line of theUnRestricted model (including the intercept)
+
+6. **Figure under the null and decision rule:**
+
+We reject the null if $F_{obs}>F_{m,n-k}$ or if p-value<0.05.
+
+```{r out.width="40%", fig.align="center", fig.cap="F distribution"}
+x = seq(0, 5, length = 100)
+distribution = df(x = x, df1 = 1, df2 = 1715)
+plot(x, distribution,type="l")
+```
+
+7. **Calculations and decision:**
+
+p-value = 1.845e-08 < 0.05 so we reject the null.
+
+8. **Conclusion:**
+
+Under the 5% significance level, we reject the null that gender is not relevant for hourly earnings. Hence, with this model we cam see that there is gender discrimination.
+
+## Quantify the effect of difference in education
+
+We now make the assumption that experience and education are the only variables that matter, meaning that any difference after we have controlled for these variables is the result of discrimination. Thus we use the same model as the previous Mincer's earnings equation.
+
+$$Y_{i}^{M}=\alpha_{0}+\alpha_{1} E d u_{i}^{M}+\alpha_{2} E x p_{i}^{M} \quad+u_{i}^{M}$$
+
+$$Y_{i}^{F}=\beta_{0}+\beta_{1} E d u_{i}^{F}+\beta_{2} E x p_{i}^{F} \quad+u_{i}^{F}$$
+
+```{r}
+dat_m = subset(dat, gender == "1")
+dat_f = subset(dat, gender == "2")
+
+model_m = lm(log_wage ~ education + experience, dat_m)
+model_f = lm(log_wage ~ education + experience, dat_f)
+
+difference = ((model_m$coefficients[1]-model_f$coefficients[1])+(model_m$coefficients[2]-model_f$coefficients[2])*mean(dat_f$education)+(model_m$coefficients[3]-model_f$coefficients[3])*mean(dat_f$experience))/((model_m$coefficients[1]-model_f$coefficients[1])+(model_m$coefficients[2]-model_f$coefficients[2])*mean(dat_f$education)+(model_m$coefficients[3]-model_f$coefficients[3])*mean(dat_f$experience)+model_m$coefficients[2]*(mean(dat_m$education)-mean(dat_f$education))+model_m$coefficients[3]*(mean(dat_m$experience)-mean(dat_f$experience)))
+```
+
+$$\begin{array}{l}{\text { Diff }=\frac{\text { Difference due to gender only }}{\text { Total Difference }}} \\ {\text { Diff }=\frac{\text { Discr. levelt }}{\text { Discr. level + Diff Edu.t Discr. effect of Edu+Diff Exp.t Discr effect of Exp. }}} \\ {\text { Diff }=\frac{\left(\alpha_{0}-\beta_{0}\right)+\left(\alpha_{1}-\beta_{1}\right) \times \overline{E d u^{F}}+\left(\alpha_{2}-\beta_{2}\right) \times \overline{E x p^{F}}}{\left(\alpha_{0}-\beta_{0}\right)+\alpha_{1}\left(E d u^{M}-E d u^{F}\right)+\left(\alpha_{1}-\beta_{1}\right) \times \overline{E d u^{F}}+\alpha_{2}(\overline{E x p^{M}}-\overline{E x p^{F}})+\left(\alpha_{2}-\beta_{2}\right) \times \overline{E x p^{F}}}}\end{array}$$
+
+According to our calculations, the difference in the log of the hourly wage due to gender discrimination is 0.56 kr per hour. Thus, the difference in the hourly wage would be the exponential of that difference. In our case, this is $e^{0.56}$, or approximately 1.186 kr per hour. We can conclude that there is an average wage difference of 1.75 kr per hour due to gender-based discrimination.
+
+\newpage
+
+# Instrumental variable method
+
+Let's assume that education is correlated with personal ability, basically how intelligent/capable a person is. Ability as a variable is not in the model, nor the data. This would make education correlated with the error term, thus making OLS biased and inconsistent for estimation. In order to combat this, we could use an instrument as a proxy for education. This proxy needs to be uncorrelated with the error term, and correlated with education.
+
+We want the strongest possible instrument, so we want the highest possible correlation between the instrument and education. We can look to our dataset in order to find possible variables for the instrument. For example the education of an individual's parents could be correlated with the individual's own level of education. This is because education is generally correlated with higher levels of income, which in turn can support higher levels of education. Therefore, children of highly educated parents is more likely to be highly educated themselves. These would be the most obvious variables to use. However, there might be other variables, such as parents nationality, in our dataset also correlated with education. We will perform tests to check which of these variables would be strong instruments for education.
+
+```{r}
+fit1 <- lm(education ~ mother_schooling + father_schooling + live + father_occupation + mother_occupation + lived_with, dat)
+sum = summary(fit1)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the model: education ~ IV", digits = 3)
+```
+
+Above, we can see the results from our test. As expected, both parents education is relevant. Variable *live* measures the urban level of where the individual grew up, where 1 is rural and 5 is living in a major city. Living in a city seems to have a positive effect of 0.51 per point, so a person living in a big city (5 points) would have 2.5 more years of education, compared to someone that lived in the countryside. We also looked at the occupation of both parents. The reason why the mothers occupation is significant, but not the fathers, is because the questions are phrased quite differently in the data: Mothers occupation has to do with how long she's worked outside the home, where as the fathers education has to do with what type of occupation he has. Variable *lived_with* measures if an individual lived with both of his/her parents of whether they lived with only one, with the highest numbers meaning that the individual lived in a foster home or an orphanage. One point of *Lived_with* removes on average 0.365 years of education, so an individual growing up in an orphanage (9 "points") would have on average 3.285 less years of education, compared to someone that grew up with both of their parents.
+
+All of our variables except Father_occupation are significant and are thus relavant instruments. However, we need to investigate if the variables are correlated with the error term, which is the unexplained variation. This is what determines the validity of the instruments.
+
+```{r}
+fit2 <- lm(m2$residuals ~ mother_schooling + father_schooling + live + mother_occupation + lived_with, dat)
+sum = summary(fit2)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the model: residuals ~ IV", digits = 3)
+```
+
+Here we can see that variables *live* and *mother_occupation* are significant, meaning that they are highly correlated with the error term. This would mean that they are **not valid** instruments for esimating education. In concludions, *mother_schooling*, *Father_schooling* and *lived_with* are all **valid** instruments.
+
+```{r}
+sls <- lm(education ~ mother_schooling + father_schooling + lived_with, dat)
+sum = summary(sls)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the model: education ~ IV", digits = 3)
+IV = fitted.values(sls)
+dat = cbind(dat, IV)
+```
+
+\newpage
+
+# Two-Stage least squares
+
+## Taking *education* into account
+
+```{r}
+tsls2 = lm(wage ~ gender_1 + IV, dat)
+sum = summary(tsls2)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the Two-Stage least squares model containing education variable", digits = 3)
+```
+
+We convert our the fitted values of our instrument into a variable called *IV*. We then replace *education* with the *IV* to create a 2 Stage Least Squares regression. This is to protect the variable *education* from being correlated with the error term, instead replacing it with *IV*. Compared to when we controlled for education, we can see that the difference in hourly wage due to discrimination has increased. In the OLS verision, male individuals earned on average 8.94 kr per hour more than female individuals, holding all other values constant. Now this difference has increased to approximatly 10 kr per hour, when we hold *IV* to be constant. We can also see that the impact of education has decreased, from 1.84 kr per hour to approximatly 1 kr per hour, holding all other variables constant.
+
+We perform an F-test to see if the instrument for education is the variable affecting the difference in the wage rather than gender.
+
+$$wage= \beta_0 + \beta_1 \ gender + \beta_2 \  \hat{education}$$
+
+$$\hat{education} = \hat \alpha_0 + \hat \alpha_1 Mother_{-}schooling + \hat \alpha_2 Father_{-}schooling + \hat \alpha_3  Lived_{-}with$$
+
+1. **Hypothesis:**
+
+$$H_0: \beta_1=0$$
+$$H_1: \beta_1 \neq 0$$
+
+2. **Significance level:** 
+
+$$\alpha=0.05$$
+
+3. **Estimators:** 
+
+$$\hat\beta_1, R^2_{UR}, R^2_{R}$$
+
+4. **Assumptions:** 
+
+$$Large \ n$$
+
+5. **Test statistic:**
+
+$$F_{obs}=\frac{(R^2_{UR}- R^2_{R})/m}{(1-R^2_{UR})/(n-k)} \sim F_{m,n-k} $$
+
+where,
+
+- $R^2_{UR}$ is the coefficient of determination for the UnRestricted model
+- $R^2_{R}$  is the coefficient of determination for the Restricted model
+- m is the number of (linear) restrictions (in the null hypothesis)
+- n is the number of observations
+- k is the number of regression coefficients (parameters) in the regression line of theUnRestricted model (including the intercept)
+
+6. **Figure under the null and decision rule:**
+
+We reject the null if $F_{obs}>F_{m,n-k}$ or if p-value<0.05.
+
+```{r out.width="40%", fig.align="center", fig.cap="F distribution"}
+x = seq(0, 5, length = 100)
+plot(x, df(x = x, df1 = 1, df2 = 1715),type="l")
+```
+
+7. **Calculations and decision:**
+
+p-value=2.2e-16<0.05 so we reject the null.
+
+8. **Conclusion:**
+
+Under the 5% significance level, we reject the null that gender is not relevant for hourly earnings. Hence, with this model we cam see that there is gender discrimination.
+
+\newpage
+
+## Taking *education* and *experience* into account
+
+```{r}
+tsls3 = lm(wage ~ gender_1 + IV + experience, dat)
+sum = summary(tsls3)
+sum$coefficients %>% 
+   kable(caption = "Regression Coefficients for the Two-Stage least squares model containing education variable", digits = 3)
+```
+
+Now we control for both experience and education, where *IV* is the instrument of estimation for *education*. According to the estimated model, a male individual would earn 7.96 kr per hour more than a female individual, holding all other variables constant. Similarly education increases hourly wage by 1.94 kr per year studied, holding all other variables constant. One extra year of working provides 0.368 kr per hour, holding all other variables constant.
+
+We perform an F-test to see if the instrument for education and experience are the variables affecting the difference in the wage rather than gender.
+
+$$wage= \beta_0 + \beta_1 \  gender + \beta_2 \ \hat{education} + \beta_3 \ experience$$
+
+$$\hat{education} = \hat \alpha_0 + \hat \alpha_1 Mother_{-}schooling + \hat \alpha_2 Father_{-}schooling + \hat \alpha_3  Lived_{-}with$$
+
+1. **Hypothesis:**
+
+$$H_0: \beta_1=0$$
+
+$$H_1: \beta_1 \neq 0$$
+
+2. **Significance level:** 
+
+$$\alpha=0.05$$
+
+3. **Estimators:** 
+
+$$\hat\beta_1, R^2_{UR}, R^2_{R}$$
+
+4. **Assumptions:** 
+
+$$Large \ n$$
+
+5. **Test statistic:**
+
+$$F_{obs}=\frac{(R^2_{UR}- R^2_{R})/m}{(1-R^2_{UR})/(n-k)} \sim F_{m,n-k} $$
+
+where,
+
+- $R^2_{UR}$ is the coefficient of determination for the UnRestricted model
+- $R^2_{R}$  is the coefficient of determination for the Restricted model
+- m is the number of (linear) restrictions (in the null hypothesis)
+- n is the number of observations
+- k is the number of regression coefficients (parameters) in the regression line of theUnRestricted model (including the intercept)
+
+6. **Figure under the null and decision rule:**
+
+We reject the null if $F_{obs}>F_{m,n-k}$ or if p-value<0.05.
+
+```{r out.width="40%", fig.align="center", fig.cap="F distribution"}
+x = seq(0, 5, length = 100)
+plot(x, df(x = x, df1 = 1, df2 = 1715),type="l")
+```
+
+7. **Calculations and decision:**
+
+p-value=2.2e-16<0.05 so we reject the null.
+
+8. **Conclusion:**
+
+Under the 5% significance level, we reject the null that gender is not relevant for hourly earnings. Hence, with this model we can see that there is gender discrimination.
+
+## Quantify the effect of difference in gender discrimination with 2SLS
+
+$$Y_{i}^{M}=\alpha_{0}+\alpha_{1} IV_{i}^{M}+\alpha_{2} E x p_{i}^{M} \quad+u_{i}^{M}$$
+
+$$Y_{i}^{F}=\beta_{0}+\beta_{1} IV{i}^{F}+\beta_{2} E x p_{i}^{F} \quad+u_{i}^{F}$$
+
+$$\begin{array}{l}{\text { Diff }=\frac{\text { Difference due to gender only }}{\text { Total Difference }}} \\ {\text { Diff }=\frac{\text { Discr. levelt }}{\text { Discr. level + Diff IV.t Discr. effect of IV+Diff Exp.t Discr effect of Exp. }}} \\ {\text { Diff }=\frac{\left(\alpha_{0}-\beta_{0}\right)+\left(\alpha_{1}-\beta_{1}\right) \times \overline{IV^{F}}+\left(\alpha_{2}-\beta_{2}\right) \times \overline{E x p^{F}}}{\left(\alpha_{0}-\beta_{0}\right)+\alpha_{1}\left(IV^{M}-IV^{F}\right)+\left(\alpha_{1}-\beta_{1}\right) \times \overline{IV^{F}}+\alpha_{2}(\overline{E x p^{M}}-\overline{E x p^{F}})+\left(\alpha_{2}-\beta_{2}\right) \times \overline{E x p^{F}}}}\end{array}$$
+
+```{r}
+sls_m = lm(education ~ mother_schooling + father_schooling + lived_with, dat_m)
+sls_f = lm(education ~ mother_schooling + father_schooling + lived_with, dat_f)
+
+IV_m = fitted.values(sls_m)
+IV_f = fitted.values(sls_f)
+
+dat_m = cbind(dat_m, IV_m)
+dat_f = cbind(dat_f, IV_f)
+
+model_m = lm(log_wage_BC ~ IV_m + experience + experience_sq, dat_m)
+model_f = lm(log_wage_BC ~ IV_f + experience + experience_sq, dat_f)
+
+difference = ((model_m$coefficients[1]-model_f$coefficients[1])+(model_m$coefficients[2]-model_f$coefficients[2])*mean(IV_f)+(model_m$coefficients[3]-model_f$coefficients[3])*mean(dat_f$experience))/((model_m$coefficients[1]-model_f$coefficients[1])+(model_m$coefficients[2]-model_f$coefficients[2])*mean(IV_f)+(model_m$coefficients[3]-model_f$coefficients[3])*mean(dat_f$experience)+model_m$coefficients[2]*(mean(IV_m)-mean(IV_f))+model_m$coefficients[3]*(mean(dat_m$experience)-mean(dat_f$experience)))
+difference
+```
+
+According to our calculations, the difference in the log of the hourly wage due to gender discrimination is 0.47 kr per hour. Thus, the difference in the hourly wage would be the exponential of that difference. In our case, this is $e^{0.47}$, or approximately 1.27 kr per hour. We can conclude that there is an average wage difference of 1.27 kr per hour due to gender-based discrimination.
+
+\newpage
+
+# Comparison between OLS and 2SLS
+
+```{r}
+table_a = data.frame(Model = c("OLS","2SLS", "Difference"),
+                  Gender = c("8.95", "10.01", "1.06"),
+                  Education = c("1.84", "1.01", "-0.83"))
+
+table_b = data.frame(Model = c("OLS","2SLS", "Difference"),
+                  Gender = c("5.61", "7.96", "2.35"),
+                  Education = c("2.39", "1.94", "-0.45"),
+                  Experience = c("0.53", "0.36", "-0.16"))
+
+table_c = data.frame(Model = c("OLS","2SLS", "Difference"),
+                  Log_wage = c("0.44", "0.47", "0.03"),
+                  Wage = c("1.19", "1.27", "0.08"))
+```
+
+
+```{r}
+kable(table_a, caption = "Table for comparison, task 4a and 6a")
+```
+
+In the above table, we can see the differences in estimation between OLS and 2SLS when taking controlling for education. The difference in hourly wage is 1.06 kr more for 2SLS and the difference in the estimated hourly wage due to one year of education is 0.83 kr less for 2SLS. The difference in numbers is quite small. 2SLS seems to increase the effect of gender and decrease the effect of education.
+
+```{r}
+kable(table_b, caption = "Table for comparison, task 4b and 6b")
+```
+
+In this table, we compare OLS and 2SLS when controlling for experience and education. We can see the same trend we saw in table 5: Increase hourly wage due to gender difference and decrease in hourly wage due to experience and education. The difference in gender is larger compared to model 5, but the difference in education is smaller. Hourly wage due to gender is 2.35 kr more when using 2SLS, holding all other variables constant. Hourly wage due from one year of education is 0.45 kr less for 2SLS and hourly wage due to one year of work is 0.16 kr less. 
+
+```{r}
+kable(table_c, caption = "Table for comparison, task 4c and 6c")
+```
+
+From the above table, both models show that there is a difference in hourly wage due to gender based discrimination, only differing sligthly in values. According to OLS, the log difference in hourly wage due to gender is 0.44 kr per hour, and the exponential difference is 1.19 kr per hour. For 2SLS the log difference in hourly wage due to gender is 0.47 kr per hour, and the exponential difference is 1.27 kr per hour. We can see that the difference in log hourly wage is 0.03 kr per hour. The exponential difference is 0.08 kr per hour. We conclude that there is a slight difference in estimation between the two models.
+
+\newpage
+
+# One more year of education
+
+
+
+
+
+
+
+
+
 
 \newpage
 
@@ -250,7 +689,7 @@ From the above table, we can see that the result for both tests are the same. Bo
 
 # Appendix
 
-## Regression Ourcome
+## Regression Ourcome for the Mincer's earnings equation
 
 ```{r}
 summary(m1)
@@ -262,8 +701,23 @@ summary(m1)
 summary(m2)
 ```
 
-## Regression Ourcome for the model including dummy variable
+## Regression Ourcome for the regression model including dummy variable
 
 ```{r}
 summary(m3)
 ```
+
+## Regression Ourcome for the regression taking *education* into account
+
+```{r}
+summary(m4)
+```
+
+## Regression Ourcome for the regression taking *education* and *experience* into account
+
+```{r}
+summary(m5)
+```
+
+## Code for the whole study
+
