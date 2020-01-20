@@ -445,7 +445,7 @@ difference = ((model_m$coefficients[1]-model_f$coefficients[1])+(model_m$coeffic
 
 $$\begin{array}{l}{\text { Diff }=\frac{\text { Difference due to gender only }}{\text { Total Difference }}} \\ {\text { Diff }=\frac{\text { Discr. levelt }}{\text { Discr. level + Diff Edu.t Discr. effect of Edu+Diff Exp.t Discr effect of Exp. }}} \\ {\text { Diff }=\frac{\left(\alpha_{0}-\beta_{0}\right)+\left(\alpha_{1}-\beta_{1}\right) \times \overline{E d u^{F}}+\left(\alpha_{2}-\beta_{2}\right) \times \overline{E x p^{F}}}{\left(\alpha_{0}-\beta_{0}\right)+\alpha_{1}\left(E d u^{M}-E d u^{F}\right)+\left(\alpha_{1}-\beta_{1}\right) \times \overline{E d u^{F}}+\alpha_{2}(\overline{E x p^{M}}-\overline{E x p^{F}})+\left(\alpha_{2}-\beta_{2}\right) \times \overline{E x p^{F}}}}\end{array}$$
 
-According to our calculations, the difference in the log of the hourly wage due to gender discrimination is 0.56 Kr per hour. Thus, the difference in the hourly wage would be the exponential of that difference. In our case, this is $e^{0.56}$, or approximately 1.186 Kr per hour. We can conclude that there is an average wage difference of 1.75 Kr per hour due to gender-based discrimination.
+According to our calculations, the difference in the log of the hourly wage due to gender discrimination is 0.56 Kr per hour. Thus, the difference in the hourly wage would be the exponential of that difference. In our case, this is $e^{0.56}$, or approximately 1.75 Kr per hour. We can conclude that there is an average wage difference of 1.75 Kr per hour due to gender-based discrimination.
 
 \newpage
 
